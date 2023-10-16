@@ -1,2 +1,3 @@
 # Referite-Backend
-this is backend for referite project
+This is repository of backend for referite project.
+
