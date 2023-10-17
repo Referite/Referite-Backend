@@ -8,8 +8,10 @@ from pymongo import MongoClient
 # password = os.getenv("password")
 
 client = MongoClient(
-    f"mongodb+srv://referee:aBuxkgKjErZk9PZg@referite.4vc13sv.mongodb.net/?retryWrites=true&w=majority"
-)
+    f"mongodb+srv://referee:aBuxkgKjErZk9PZg@referite.4vc13sv.mongodb.net/?retryWrites=true&w=majority",
+    tls=True,
+    tlsAllowInvalidCertificates=True)
+
 
 # use database name 
 db = client["referee"]
