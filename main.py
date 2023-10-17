@@ -1,16 +1,15 @@
 from beanie import init_beanie
 from fastapi import FastAPI
 from motor.motor_asyncio import AsyncIOMotorClient
-
+from decouple import config
 from db import Sport, SportSchedule, SportType
-from typing import List, Dict, Union
 
 from Enum.sportStatus import SportStatus
 app = FastAPI()
 
 @app.on_event('startup')
 async def connect_db():
-    client = AsyncIOMotorClient('mongodb+srv://referee:aBuxkgKjErZk9PZg@referite.4vc13sv.mongodb.net/?retryWrites=true&w=majority',
+    client = AsyncIOMotorClient(config("MONGO_URL", cast=str, default="mongodb://localhost:27017"),
                                 tls=True,
                                 tlsAllowInvalidCertificates=True)
 
