@@ -1,5 +1,6 @@
 from beanie import Document
-from Enum.sport_status import SportStatus
+from Enum.sportStatus import SportStatus
+from enum import Enum
 from typing import List
 import datetime
 
@@ -19,3 +20,4 @@ class Sport(Document):
 class SportSchedule(Document):
     datetime: datetime.datetime
     sport: List[Sport]
+    

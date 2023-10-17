@@ -1,6 +1,6 @@
 from enum import Enum
 
-class SportStatus:
+class SportStatus(Enum):
     CEREMONIES = "CEREMONIES"
     COMPETITIVE = "COMPETITIVE"
     TROPHY = "TROPHY"
