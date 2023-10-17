@@ -1,23 +1,17 @@
-from pymongo import MongoClient
-# from dotenv import load_dotenv
-# import os
+from beanie import init_beanie
+from fastapi import FastAPI
+from motor.motor_asyncio import AsyncIOMotorClient
 
-# get username and password from .env file
-# load_dotenv(".env")
-# username = os.getenv("username")
-# password = os.getenv("password")
+from db import Sport, SportSchedule, SportType
+from typing import List, Dict, Union
 
-client = MongoClient(
-    f"mongodb+srv://referee:aBuxkgKjErZk9PZg@referite.4vc13sv.mongodb.net/?retryWrites=true&w=majority",
-    tls=True,
-    tlsAllowInvalidCertificates=True)
+app = FastAPI()
 
+@app.on_event('startup')
+async def connect_db():
+    client = AsyncIOMotorClient('mongodb+srv://referee:aBuxkgKjErZk9PZg@referite.4vc13sv.mongodb.net/?retryWrites=true&w=majority',
+                                tls=True,
+                                tlsAllowInvalidCertificates=True)
 
-# use database name 
-db = client["referee"]
-# use collection name 
-collection = db["referee"]
+    await init_beanie(database=client.referee, document_models=[SportType, SportSchedule, Sport])
 
-test = collection.find_one({"eiei": "iiiiiiiiii"})
-test["_id"] = str(test["_id"])
-print(test)
