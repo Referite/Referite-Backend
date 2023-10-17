@@ -43,4 +43,23 @@ async def add_some_data():
 
 @app.get('/2')
 async def add_data():
-    pass
+    sport_type_body = {
+        "type_id": 1,
+        "type_name": "12v11",
+        "status": SportStatus.CEREMONIES
+    }
+
+    sport_body = {
+        "sport_id": 1,
+        "sport_name": "Football",
+        "sport_type": [sport_type_body]
+    }
+
+    sport_schedjule_body = {
+        "datetime": "2021-08-01T00:00:00",
+        "sport": [sport_body]
+    }
+
+    await Sport(**sport_body).insert()
+    await SportType(**sport_type_body).insert()
+    await SportSchedule(**sport_schedjule_body).insert()
