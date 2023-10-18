@@ -5,8 +5,8 @@ import jwt
 from decouple import config
 
 
-JWT_SECRET = config("secret")
-JWT_ALGORITHM = config("algorithm", default="HS256")
+JWT_SECRET = config("JWT_SECRET")
+JWT_ALGORITHM = config("JWT_ALGORITHM", default="HS256")
 
 
 def token_response(token: str):
@@ -15,10 +15,10 @@ def token_response(token: str):
     }
 
 def signJWT(user_id: str) -> Dict[str, str]:
-    """Return a JWT token for the user_id"""
+    """Return a JWT token for the user_id that expires in 1 hour"""
     payload = {
         "user_id": user_id,
-        "expires": time.time() + 600
+        "expires": time.time() + 3600
     }
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 

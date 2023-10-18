@@ -1,10 +1,10 @@
 from beanie import init_beanie
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from motor.motor_asyncio import AsyncIOMotorClient
 from decouple import config
 from db import Sport, SportSchedule, SportType, RefereeID
 from auth.auth_bearer import JWTBearer
-from auth.auth_handler import signJWT 
+from auth.auth_handler import signJWT
 from models import RefereeIdBody
 from Enum.sportStatus import SportStatus
 
@@ -69,16 +69,32 @@ async def add_data():
     await SportType(**sport_type_body).insert()
     await SportSchedule(**sport_schedjule_body).insert()
 
+
+def check_user(id_body: RefereeIdBody):
+    """Check if user exists in database return boolean"""
+    return bool(
+        RefereeID.find_one(
+            {
+                "username": str(id_body.username),
+                "password": str(id_body.password),
+            },
+            {"_id": False},
+        )
+    )
+
+
 @app.post('/login/verify', status_code=201)
 async def login(id_body: RefereeIdBody):
+    """Return a JWT token for the user_id
+    if the user exists in the database
+    Token format:{access_token: token}
+    """
     try:
-        name = str(id_body.username.decode())
-        password = str(id_body.password.decode())
+        if check_user(id_body):
+            return signJWT(id_body.username)
+    except Exception as e:
+        raise HTTPException(500, "Something went wrong") from e
 
-        if RefereeID.find_one({"username":name, "password":password}, {"_id": False}):
-            return {"message": f"Welcome, {name} Login successfully"}
-        else:
-            return {"message": "Incorrect username or password, Please try again."}
-    except Exception:
-        raise HTTPException(500, "Something went wrong")
-        
+@app.get('/test/verify', dependencies=[Depends(JWTBearer())])
+async def toast():
+    return "hello world"
