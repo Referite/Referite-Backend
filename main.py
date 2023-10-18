@@ -12,7 +12,7 @@ app = FastAPI()
 async def connect_db():
     client = AsyncIOMotorClient(config("MONGO_URL", cast=str, default="mongodb://localhost:27017"),
                                 tls=True,
-                                tlsAllowIynvalidCertificates=True)
+                                tlsAllowInvalidCertificates=True)
 
     await init_beanie(database=client.referee, document_models=[SportType, SportSchedule, Sport])
 
@@ -20,11 +20,12 @@ async def connect_db():
 @app.get('/1')
 async def add_some_data():
 
-    body = {
+    body1 = {
         "datetime": "2021-08-01T00:00:00",
         "sport": [{
             "sport_id": 1,
             "sport_name": "Football",
+            "is_celemonies": False,
             "sport_type": [
                 {
                     "type_id": 1,
@@ -39,7 +40,17 @@ async def add_some_data():
             ]}]
     }
 
-    await SportSchedule(**body).insert()
+    body2 = {
+        "datetime": "2021-09-01T00:00:00",
+        "sport": [{
+            "sport_id": 1,
+            "sport_name": "Football",
+            "is_celemonies": True,
+            "sport_type": None
+        }]}
+
+    await SportSchedule(**body1).insert()
+    await SportSchedule(**body2).insert()
 
 
 @app.get('/2')

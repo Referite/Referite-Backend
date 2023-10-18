@@ -1,7 +1,7 @@
 from beanie import Document
 from Enum.sportStatus import SportStatus
-from enum import Enum
-from typing import List
+from typing import List, Optional
+from pydantic import validator
 import datetime
 
 class SportType(Document):
@@ -15,7 +15,14 @@ class SportType(Document):
 class Sport(Document):
     sport_id: int
     sport_name: str
-    sport_type: List[SportType]
+    sport_type: Optional[List[SportType]]
+    is_celemonies: bool
+
+    @validator('sport_type', always=True)
+    def validate(cls, value, values):
+        if values.get("is_celemonies") and value:
+            raise ValueError("sport_type should not be present when is_celemonies is True")
+        return value
 
 class SportSchedule(Document):
     datetime: datetime.datetime
