@@ -3,6 +3,8 @@ from fastapi import FastAPI, HTTPException
 from motor.motor_asyncio import AsyncIOMotorClient
 from decouple import config
 from db import Sport, SportSchedule, SportType, RefereeID
+from auth.auth_bearer import JWTBearer
+from auth.auth_handler import signJWT 
 from models import RefereeIdBody
 from Enum.sportStatus import SportStatus
 
@@ -14,7 +16,7 @@ app = FastAPI()
 async def connect_db():
     client = AsyncIOMotorClient(config("MONGO_URL", cast=str, default="mongodb://localhost:27017"),
                                 tls=True,
-                                tlsAllowIynvalidCertificates=True)
+                                tlsAllowInvalidCertificates=True)
 
     await init_beanie(database=client.referee, document_models=[SportType, SportSchedule, Sport, RefereeID])
 
@@ -80,10 +82,3 @@ async def login(id_body: RefereeIdBody):
     except Exception:
         raise HTTPException(500, "Something went wrong")
         
-
-
-
-import uvicorn
-
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8081, reload=True)
