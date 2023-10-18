@@ -70,7 +70,7 @@ async def add_data():
 @app.post('/login/verify', status_code=201)
 async def login(id_body: RefereeIdBody):
     try:
-        name = str(id_body.name.decode())
+        name = str(id_body.username.decode())
         password = str(id_body.password.decode())
 
         if RefereeID.find_one({"username":name, "password":password}, {"_id": False}):
@@ -83,3 +83,7 @@ async def login(id_body: RefereeIdBody):
 
 
 
+import uvicorn
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8081, reload=True)

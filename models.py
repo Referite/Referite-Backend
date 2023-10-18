@@ -4,5 +4,5 @@ class Schedule(BaseModel):
     pass
 
 class RefereeIdBody(BaseModel):
-    name: str
+    username: str
     password: str
