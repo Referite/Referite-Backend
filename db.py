@@ -20,4 +20,8 @@ class Sport(Document):
 class SportSchedule(Document):
     datetime: datetime.datetime
     sport: List[Sport]
+
+class RefereeID(Document):
+    username: str
+    password: str
     

@@ -1,10 +1,12 @@
 from beanie import init_beanie
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from motor.motor_asyncio import AsyncIOMotorClient
 from decouple import config
-from db import Sport, SportSchedule, SportType
-
+from db import Sport, SportSchedule, SportType, RefereeID
+from models import RefereeIdBody
 from Enum.sportStatus import SportStatus
+
+
 app = FastAPI()
 
 
@@ -14,7 +16,7 @@ async def connect_db():
                                 tls=True,
                                 tlsAllowIynvalidCertificates=True)
 
-    await init_beanie(database=client.referee, document_models=[SportType, SportSchedule, Sport])
+    await init_beanie(database=client.referee, document_models=[SportType, SportSchedule, Sport, RefereeID])
 
 
 @app.get('/1')
@@ -64,3 +66,20 @@ async def add_data():
     await Sport(**sport_body).insert()
     await SportType(**sport_type_body).insert()
     await SportSchedule(**sport_schedjule_body).insert()
+
+@app.post('/login/verify', status_code=201)
+async def login(id_body: RefereeIdBody):
+    try:
+        name = str(id_body.name.decode())
+        password = str(id_body.password.decode())
+
+        if RefereeID.find_one({"username":name, "password":password}, {"_id": False}):
+            return {"message": f"Welcome, {name} Login successfully"}
+        else:
+            return {"message": "Incorrect username or password, Please try again."}
+    except Exception:
+        raise HTTPException(500, "Something went wrong")
+        
+
+
+
