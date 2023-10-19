@@ -16,12 +16,12 @@ class Sport(Document):
     sport_id: int
     sport_name: str
     sport_type: Optional[List[SportType]]
-    is_celemonies: bool
+    is_ceremonies: bool
 
     @validator('sport_type', always=True)
     def validate(cls, value, values):
-        if values.get("is_celemonies") and value:
-            raise ValueError("sport_type should not be present when is_celemonies is True")
+        if values.get("is_ceremonies") and value:
+            raise ValueError("sport_type should not be present when is_ceremonies is True")
         return value
 
 class SportSchedule(Document):

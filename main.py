@@ -3,6 +3,8 @@ from fastapi import FastAPI
 from motor.motor_asyncio import AsyncIOMotorClient
 from decouple import config
 from db import Sport, SportSchedule, SportType
+from models import SportScheduleBody
+from utils import error_handler
 
 from Enum.sportStatus import SportStatus
 app = FastAPI()
@@ -25,7 +27,7 @@ async def add_some_data():
         "sport": [{
             "sport_id": 1,
             "sport_name": "Football",
-            "is_celemonies": False,
+            "is_ceremonies": False,
             "sport_type": [
                 {
                     "type_id": 1,
@@ -45,7 +47,7 @@ async def add_some_data():
         "sport": [{
             "sport_id": 1,
             "sport_name": "Football",
-            "is_celemonies": True,
+            "is_ceremonies": True,
             "sport_type": None
         }]}
 
@@ -75,3 +77,14 @@ async def add_data():
     await Sport(**sport_body).insert()
     await SportType(**sport_type_body).insert()
     await SportSchedule(**sport_schedjule_body).insert()
+
+@error_handler
+@app.post('/sport_schedule/add')
+async def add_sport_schedule(sport_schedule: SportScheduleBody):
+    schedule = SportSchedule(**sport_schedule.model_dump())
+    await schedule.insert()
+    return {
+        "status": "success",
+        "message": "Sport schedule added successfully",
+        "data": schedule
+    }
