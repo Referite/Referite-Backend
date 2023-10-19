@@ -71,7 +71,7 @@ async def add_data():
         "sport_type": [sport_type_body]
     }
 
-    sport_schedjule_body = {
+    sport_schedule_body = {
         "datetime": "2021-08-01T00:00:00",
         "sport": [sport_body]
     }
