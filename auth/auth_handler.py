@@ -7,6 +7,7 @@ from decouple import config
 
 JWT_SECRET = config("JWT_SECRET")
 JWT_ALGORITHM = config("JWT_ALGORITHM", default="HS256")
+COOKIE_NAME = config("COOKIE_NAME", default="Authorization")
 
 
 def token_response(token: str):
