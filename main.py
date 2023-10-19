@@ -30,7 +30,7 @@ async def add_some_data():
                 {
                     "type_id": 1,
                     "type_name": "11v11",
-                    "status": SportStatus.CEREMONIES
+                    "status": SportStatus.RECORDED
                 },
                 {
                     "type_id": 2,
