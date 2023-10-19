@@ -21,7 +21,7 @@ async def connect_db():
 
 @app.get('/1')
 async def add_some_data():
-
+    # main way to add data
     body1 = {
         "datetime": "2021-08-01T00:00:00",
         "sport": [{
@@ -57,6 +57,7 @@ async def add_some_data():
 
 @app.get('/2')
 async def add_data():
+    # alternative way to add data
     sport_type_body = {
         "type_id": 1,
         "type_name": "12v11",
@@ -66,6 +67,7 @@ async def add_data():
     sport_body = {
         "sport_id": 1,
         "sport_name": "Football",
+        "is_ceremonies": False,
         "sport_type": [sport_type_body]
     }
 
