@@ -3,3 +3,4 @@ motor
 beanie
 python-decouple
 PyJWT
+bcrypt

@@ -4,11 +4,11 @@ from fastapi.responses import RedirectResponse
 from motor.motor_asyncio import AsyncIOMotorClient
 from decouple import config
 from db import Sport, SportSchedule, SportType, RefereeID
-# from auth.auth_bearer import JWTBearer
 from auth.auth_handler import signJWT
 from auth.cookie import OAuth2PasswordBearerWithCookie
 from models import RefereeIdBody
 from Enum.sportStatus import SportStatus
+import bcrypt
 
 
 app = FastAPI()
@@ -77,22 +77,30 @@ def check_user(id_body: RefereeIdBody):
     return bool(
         RefereeID.find_one(
             {
-                "username": str(id_body.username),
-                "password": str(id_body.password),
+                "username": str(id_body.username)
             },
             {"_id": False},
         )
     )
 
+def check_password(id_body: RefereeIdBody):
+    """Check if password is correct return boolean"""
+    password = RefereeID.find_one(
+        {
+            "username": str(id_body.username)
+        },
+        {"_id": False},
+    )
+    return bool(bcrypt.checkpw(id_body.password.encode("utf-8"), password["password"].encode("utf-8")))
 
 @app.post('/login/verify', status_code=201)
 async def login(response:Response, id_body: RefereeIdBody):
-    """Return a JWT token for the user_id
-    if the user exists in the database
-    Token format:{access_token: token}
+    """
+    Receive username and password from body and check if user exists in database and password is correct
+    then set cookie with the access token, after that redirect to homepage
     """
     try:
-        if check_user(id_body):
+        if check_user(id_body) and check_password(id_body):
             access_token = signJWT(id_body.username)
             response = RedirectResponse(url='/test/verify', status_code=302) #change url to homepage
             response.set_cookie(key="access_token", value=f"Bearer {access_token}", httponly=True)
@@ -102,5 +110,5 @@ async def login(response:Response, id_body: RefereeIdBody):
 
 @app.get('/test/verify', dependencies=[Depends(oauth2_scheme)])
 async def toast():
-    """Test JWT token"""
+    """Test JWT token and cookie"""
     return {"message": "hello world"}
