@@ -32,3 +32,4 @@ def decodeJWT(token: str) -> dict:
         return decoded_token if decoded_token["expires"] >= time.time() else None
     except:
         return {}
+        
