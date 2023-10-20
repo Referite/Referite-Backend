@@ -1,6 +1,7 @@
 from beanie import init_beanie
 from fastapi import FastAPI, HTTPException, Depends, Response
 from fastapi.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from decouple import config
 from db import Sport, SportSchedule, SportType, RefereeID
@@ -14,6 +15,16 @@ import bcrypt
 
 app = FastAPI()
 oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="/login/verify")
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.on_event('startup')
