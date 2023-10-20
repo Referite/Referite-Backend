@@ -104,8 +104,13 @@ async def check_user(id_body: RefereeIdBody):
 
 async def check_password(id_body: RefereeIdBody):
     """Check if password is correct return boolean"""
-    password = await RefereeID.find_one(RefereeID.username == str(id_body.username), RefereeID.password == str(id_body.password))
+    password = await RefereeID.find_one(RefereeID.username == str(id_body.username))
     return bool(bcrypt.checkpw(id_body.password.encode("utf-8"), password.password.encode("utf-8")))
+    # return password is not None
+
+def hash_password(id_body: RefereeIdBody):
+    """Hash password"""
+    return bcrypt.hashpw(id_body.password.encode("utf-8"), bcrypt.gensalt())
 
 @app.get('/user/{username}/{password}')
 async def get_user(username, password):
@@ -116,9 +121,11 @@ async def get_user(username, password):
 @app.post('/create/user')
 async def create_user(id_body: RefereeIdBody):
     """Create user for testing purpose"""
-    hashed_password = bcrypt.hashpw(id_body.password.encode("utf-8"), bcrypt.gensalt())
-    id_body.password = hashed_password.decode("utf-8")
-    user = RefereeID(**id_body.model_dump())
+    data = {
+        "username": id_body.username, 
+        "password": hash_password(id_body).decode("utf-8")
+    }
+    user = RefereeID(**data)
     await user.insert()
     return {
         "status": "success",
