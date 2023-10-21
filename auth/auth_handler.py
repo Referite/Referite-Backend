@@ -1,8 +1,12 @@
 import time
 from typing import Dict
+import bcrypt
 
 import jwt
 from decouple import config
+
+from db import RefereeID
+from models import RefereeIdBody
 
 
 JWT_SECRET = config("JWT_SECRET")
@@ -15,21 +19,39 @@ def token_response(token: str):
         "access_token": token
     }
 
-def signJWT(user_id: str) -> Dict[str, str]:
+
+def create_access_token(user_id: str) -> Dict[str, str]:
     """Return a JWT token for the user_id that expires in 1 hour"""
     payload = {
         "user_id": user_id,
         "expires": time.time() + 3600
     }
-    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
-    return token_response(token)
 
-def decodeJWT(token: str) -> dict:
+def get_decodeJWT(token: str) -> dict:
     """Return the decoded token if the token is valid, else return an empty dict"""
     try:
-        decoded_token = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        decoded_token = jwt.decode(
+            token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         return decoded_token if decoded_token["expires"] >= time.time() else None
     except:
         return {}
-        
+
+
+async def check_user(id_body: RefereeIdBody):
+    """Check if user exists in database return boolean"""
+    user = await RefereeID.find_one(RefereeID.username == str(id_body.username))
+    return user is not None
+
+
+async def check_password(id_body: RefereeIdBody):
+    """Check if password is correct return boolean"""
+    password = await RefereeID.find_one(RefereeID.username == str(id_body.username))
+    return bool(bcrypt.checkpw(id_body.password.encode("utf-8"), password.password.encode("utf-8")))
+    # return password is not None
+
+
+def hash_password(id_body: RefereeIdBody):
+    """Hash password"""
+    return bcrypt.hashpw(id_body.password.encode("utf-8"), bcrypt.gensalt())
