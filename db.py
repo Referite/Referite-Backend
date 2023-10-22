@@ -17,7 +17,6 @@ class Sport(Document):
     sport_name: str
     sport_type: Optional[List[SportType]]
     is_ceremonies: bool
-    sport_status: Optional[SportType] = None
 
     @validator('sport_type', always=True)
     def validate(cls, value, values):

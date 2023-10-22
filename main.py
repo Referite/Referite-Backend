@@ -98,8 +98,8 @@ async def get_schedule():
     current_schedule = await SportSchedule.find_all().to_list()
 
     for schedule in current_schedule:
-        for sport in schedule.sport:
-            sport.sport_status = calculate_sport_status(sport.sport_type)
-    print(current_schedule, end="\n\n\n\n")
+        for ind, sport in enumerate(schedule.sport):
+            schedule.sport[ind] = dict(sport)
+            schedule.sport[ind]["sport_status"] = calculate_sport_status(schedule.sport[ind]["sport_type"])
 
-    return current_schedule
+    return {"schedule_list": current_schedule}
