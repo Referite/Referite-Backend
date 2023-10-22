@@ -17,14 +17,15 @@ class Sport(Document):
     sport_name: str
     sport_type: Optional[List[SportType]]
     is_ceremonies: bool
+    sport_status: Optional[SportType] = None
 
     @validator('sport_type', always=True)
     def validate(cls, value, values):
         if values.get("is_ceremonies") and value:
             raise ValueError("sport_type should not be present when is_ceremonies is True")
         return value
+    
 
 class SportSchedule(Document):
     datetime: datetime.datetime
     sport: List[Sport]
-    

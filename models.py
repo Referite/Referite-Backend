@@ -9,12 +9,12 @@ class SportTypeBody(BaseModel):
     status: SportStatus
 
 
-
 class SportBody(BaseModel):
     sport_id: int
     sport_name: str
     sport_type: Optional[List[SportTypeBody]]
     is_ceremonies: bool
+    sport_status: Optional[SportStatus] = None
 
     @validator('sport_type', always=True)
     def validate(cls, value, values):

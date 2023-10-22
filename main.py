@@ -96,19 +96,10 @@ async def add_sport_schedule(sport_schedule: SportScheduleBody):
 @app.get('/schedule/all')
 async def get_schedule():
     current_schedule = await SportSchedule.find_all().to_list()
-    for ind, schedule in enumerate(current_schedule):
-        # schedule["sport_status"] = calculate_sport_status(schedule["sport"]["sport_type"])
-        # for sport in schedule.sport:
-        #     # sport["sport_status"] = calculate_sport_status(sport.sport_type)
-        #     print(sport, end='\n\n\n')         
-        current_schedule[ind] = schedule.model_dump_json()   
-    print(current_schedule[0])
 
     for schedule in current_schedule:
-        # for sport in schedule:
-        print(schedule.split('\n'))
-        #     sport["sport_status"] = calculate_sport_status(sport["sport_type"])
-            # print(sport)
-
+        for sport in schedule.sport:
+            sport.sport_status = calculate_sport_status(sport.sport_type)
+    print(current_schedule, end="\n\n\n\n")
 
     return current_schedule
