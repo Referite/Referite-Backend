@@ -95,11 +95,15 @@ async def add_sport_schedule(sport_schedule: SportScheduleBody):
 @error_handler
 @app.get('/schedule/all')
 async def get_schedule():
+    """
+    get all schedule
+    """
     current_schedule = await SportSchedule.find_all().to_list()
 
     for schedule in current_schedule:
         for ind, sport in enumerate(schedule.sport):
             schedule.sport[ind] = dict(sport)
+            # calculate sport status and put into payload
             schedule.sport[ind]["sport_status"] = calculate_sport_status(schedule.sport[ind]["sport_type"])
 
     return {"schedule_list": current_schedule}
