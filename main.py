@@ -5,6 +5,7 @@ from decouple import config
 from db import Sport, SportSchedule, SportType
 from models import SportScheduleBody
 from utils import error_handler
+from utils import calculate_sport_status
 
 from Enum.sportStatus import SportStatus
 app = FastAPI()
@@ -32,12 +33,12 @@ async def add_some_data():
                 {
                     "type_id": 1,
                     "type_name": "11v11",
-                    "status": SportStatus.RECORDED
+                    "status": SportTypeStatus.RECORDED
                 },
                 {
                     "type_id": 2,
                     "type_name": "7v7",
-                    "status": SportStatus.TROPHY
+                    "status": SportTypeStatus.TROPHY
                 }
             ]}]
     }
@@ -61,7 +62,7 @@ async def add_data():
     sport_type_body = {
         "type_id": 1,
         "type_name": "12v11",
-        "status": SportStatus.CEREMONIES
+        "status": SportTypeStatus.CEREMONIES
     }
 
     sport_body = {
@@ -78,7 +79,7 @@ async def add_data():
 
     await Sport(**sport_body).insert()
     await SportType(**sport_type_body).insert()
-    await SportSchedule(**sport_schedjule_body).insert()
+    await SportSchedule(**sport_schedule_body).insert()
 
 @error_handler
 @app.post('/sport_schedule/add')
@@ -90,3 +91,24 @@ async def add_sport_schedule(sport_schedule: SportScheduleBody):
         "message": "Sport schedule added successfully",
         "data": schedule
     }
+
+@error_handler
+@app.get('/schedule/all')
+async def get_schedule():
+    current_schedule = await SportSchedule.find_all().to_list()
+    for ind, schedule in enumerate(current_schedule):
+        # schedule["sport_status"] = calculate_sport_status(schedule["sport"]["sport_type"])
+        # for sport in schedule.sport:
+        #     # sport["sport_status"] = calculate_sport_status(sport.sport_type)
+        #     print(sport, end='\n\n\n')         
+        current_schedule[ind] = schedule.model_dump_json()   
+    print(current_schedule[0])
+
+    for schedule in current_schedule:
+        # for sport in schedule:
+        print(schedule.split('\n'))
+        #     sport["sport_status"] = calculate_sport_status(sport["sport_type"])
+            # print(sport)
+
+
+    return current_schedule
