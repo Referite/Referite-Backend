@@ -62,7 +62,7 @@ async def add_data():
     sport_type_body = {
         "type_id": 1,
         "type_name": "12v11",
-        "status": SportTypeStatus.CEREMONIES
+        "status": SportStatus.CEREMONIES
     }
 
     sport_body = {
