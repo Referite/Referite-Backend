@@ -1,17 +1,16 @@
 from fastapi import FastAPI
-from models import SportScheduleBody
-from utils import error_handler
-from utils import calculate_sport_status
-
-from Enum.sportStatus import SportStatus
+from router import schedule
 from db import sport_schedule_connection
+from Enum.sportStatus import SportStatus
 
 app = FastAPI()
+
+app.include_router(schedule.router)
 
 
 @app.get('/mock')
 def add_some_data():
-    # main way to add data
+    """mock data using this endpoint"""
     body1 = {
         "datetime": "2021-08-01T00:00:00",
         "sport": [{
@@ -44,31 +43,3 @@ def add_some_data():
     sport_schedule_connection.insert_many([body1, body2])
 
     return {"message": "data mocked"}
-
-@error_handler
-@app.post('/sport_schedule/add', status_code=201)
-def add_sport_schedule(sport_schedule: SportScheduleBody):
-    sport_schedule_connection.insert_one(sport_schedule.model_dump())
-    return {
-        "status": "success",
-        "message": "Sport schedule added successfully",
-        "data": sport_schedule
-    }
-
-@error_handler
-@app.get('/schedule/all')
-def get_schedule():
-    """
-    get all schedule
-    """
-    # current_schedule = await SportSchedule.find_all().to_list()
-    current_schedule = list(sport_schedule_connection.find({}, {"_id": 0}))
-
-    print(current_schedule)
-
-    for schedule in current_schedule:
-        print(schedule, end="\n\n")
-        for sport in schedule["sport"]:
-            sport["sport_status"] = calculate_sport_status(sport["sport_type"])
-
-    return {"schedule_list": current_schedule}
