@@ -23,8 +23,8 @@ class Sport(Document):
         if values.get("is_ceremonies") and value:
             raise ValueError("sport_type should not be present when is_ceremonies is True")
         return value
+    
 
 class SportSchedule(Document):
     datetime: datetime.datetime
     sport: List[Sport]
-    

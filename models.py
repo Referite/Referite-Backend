@@ -9,7 +9,6 @@ class SportTypeBody(BaseModel):
     status: SportStatus
 
 
-
 class SportBody(BaseModel):
     sport_id: int
     sport_name: str

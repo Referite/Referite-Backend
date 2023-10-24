@@ -5,6 +5,7 @@ from decouple import config
 from db import Sport, SportSchedule, SportType
 from models import SportScheduleBody
 from utils import error_handler
+from utils import calculate_sport_status
 
 from Enum.sportStatus import SportStatus
 app = FastAPI()
@@ -78,7 +79,7 @@ async def add_data():
 
     await Sport(**sport_body).insert()
     await SportType(**sport_type_body).insert()
-    await SportSchedule(**sport_schedjule_body).insert()
+    await SportSchedule(**sport_schedule_body).insert()
 
 @error_handler
 @app.post('/sport_schedule/add')
@@ -90,3 +91,19 @@ async def add_sport_schedule(sport_schedule: SportScheduleBody):
         "message": "Sport schedule added successfully",
         "data": schedule
     }
+
+@error_handler
+@app.get('/schedule/all')
+async def get_schedule():
+    """
+    get all schedule
+    """
+    current_schedule = await SportSchedule.find_all().to_list()
+
+    for schedule in current_schedule:
+        for ind, sport in enumerate(schedule.sport):
+            schedule.sport[ind] = dict(sport)
+            # calculate sport status and put into payload
+            schedule.sport[ind]["sport_status"] = calculate_sport_status(schedule.sport[ind]["sport_type"])
+
+    return {"schedule_list": current_schedule}
