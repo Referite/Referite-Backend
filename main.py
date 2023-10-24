@@ -33,12 +33,12 @@ async def add_some_data():
                 {
                     "type_id": 1,
                     "type_name": "11v11",
-                    "status": SportTypeStatus.RECORDED
+                    "status": SportStatus.RECORDED
                 },
                 {
                     "type_id": 2,
                     "type_name": "7v7",
-                    "status": SportTypeStatus.TROPHY
+                    "status": SportStatus.TROPHY
                 }
             ]}]
     }
