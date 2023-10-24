@@ -2,9 +2,9 @@ from Enum.sportStatus import SportStatus
 from typing import List, Dict
 
 def error_handler(f):
-    async def wrapper(*arg, **kwargs):
+    def wrapper(*arg, **kwargs):
         try:
-            return await f(*arg, **kwargs)
+            return f(*arg, **kwargs)
         except Exception as e:
             return {
                 "status": "error",
@@ -22,8 +22,8 @@ def calculate_sport_status(sport_types: List[Dict]):
     if sport_types is None:
         return SportStatus.CEREMONIES
     for sport_type in sport_types:
-        if sport_type.status == SportStatus.COMPETITIVE:
+        if sport_type["status"] == SportStatus.COMPETITIVE:
             return SportStatus.COMPETITIVE
-        if sport_type.status == SportStatus.TROPHY:
+        if sport_type["status"] == SportStatus.TROPHY:
             return SportStatus.TROPHY
     return SportStatus.RECORDED

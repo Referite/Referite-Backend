@@ -1,27 +1,16 @@
-from beanie import init_beanie
 from fastapi import FastAPI
-from motor.motor_asyncio import AsyncIOMotorClient
-from decouple import config
-from db import Sport, SportSchedule, SportType
 from models import SportScheduleBody
 from utils import error_handler
 from utils import calculate_sport_status
 
 from Enum.sportStatus import SportStatus
+from db import sport_schedule_connection
+
 app = FastAPI()
 
 
-@app.on_event('startup')
-async def connect_db():
-    client = AsyncIOMotorClient(config("MONGO_URL", cast=str, default="mongodb://localhost:27017"),
-                                tls=True,
-                                tlsAllowInvalidCertificates=True)
-
-    await init_beanie(database=client.referee, document_models=[SportType, SportSchedule, Sport])
-
-
-@app.get('/1')
-async def add_some_data():
+@app.get('/mock')
+def add_some_data():
     # main way to add data
     body1 = {
         "datetime": "2021-08-01T00:00:00",
@@ -52,58 +41,34 @@ async def add_some_data():
             "sport_type": None
         }]}
 
-    await SportSchedule(**body1).insert()
-    await SportSchedule(**body2).insert()
+    sport_schedule_connection.insert_many([body1, body2])
 
-
-@app.get('/2')
-async def add_data():
-    # alternative way to add data
-    sport_type_body = {
-        "type_id": 1,
-        "type_name": "12v11",
-        "status": SportStatus.CEREMONIES
-    }
-
-    sport_body = {
-        "sport_id": 1,
-        "sport_name": "Football",
-        "is_ceremonies": False,
-        "sport_type": [sport_type_body]
-    }
-
-    sport_schedule_body = {
-        "datetime": "2021-08-01T00:00:00",
-        "sport": [sport_body]
-    }
-
-    await Sport(**sport_body).insert()
-    await SportType(**sport_type_body).insert()
-    await SportSchedule(**sport_schedule_body).insert()
+    return {"message": "data mocked"}
 
 @error_handler
-@app.post('/sport_schedule/add')
-async def add_sport_schedule(sport_schedule: SportScheduleBody):
-    schedule = SportSchedule(**sport_schedule.model_dump())
-    await schedule.insert()
+@app.post('/sport_schedule/add', status_code=201)
+def add_sport_schedule(sport_schedule: SportScheduleBody):
+    sport_schedule_connection.insert_one(sport_schedule.model_dump())
     return {
         "status": "success",
         "message": "Sport schedule added successfully",
-        "data": schedule
+        "data": sport_schedule
     }
 
 @error_handler
 @app.get('/schedule/all')
-async def get_schedule():
+def get_schedule():
     """
     get all schedule
     """
-    current_schedule = await SportSchedule.find_all().to_list()
+    # current_schedule = await SportSchedule.find_all().to_list()
+    current_schedule = list(sport_schedule_connection.find({}, {"_id": 0}))
+
+    print(current_schedule)
 
     for schedule in current_schedule:
-        for ind, sport in enumerate(schedule.sport):
-            schedule.sport[ind] = dict(sport)
-            # calculate sport status and put into payload
-            schedule.sport[ind]["sport_status"] = calculate_sport_status(schedule.sport[ind]["sport_type"])
+        print(schedule, end="\n\n")
+        for sport in schedule["sport"]:
+            sport["sport_status"] = calculate_sport_status(sport["sport_type"])
 
     return {"schedule_list": current_schedule}
