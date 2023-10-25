@@ -29,7 +29,6 @@ def get_schedule():
     """
     get all schedule
     """
-    # current_schedule = await SportSchedule.find_all().to_list()
     current_schedule = list(sport_schedule_connection.find({}, {"_id": 0}))
 
     for schedule in current_schedule:
