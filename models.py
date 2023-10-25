@@ -1,4 +1,4 @@
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, field_validator
 from Enum.sportStatus import SportStatus
 from typing import List, Optional
 import datetime
@@ -12,7 +12,16 @@ class RefereeIdBody(BaseModel):
 class SportTypeBody(BaseModel):
     type_id: int
     type_name: str
-    status: SportStatus
+    status: str
+
+    @field_validator('status')
+    @classmethod
+    def status_must_be_enum(cls, v: str):
+        try:
+            SportStatus(v)
+        except AssertionError as e:
+            raise ValueError("status must be ['CEREMONIES', 'COMPETITIVE', 'TROPHY', 'RECORDED']")
+        return v
 
 class SportBody(BaseModel):
     sport_id: int
@@ -29,3 +38,4 @@ class SportBody(BaseModel):
 class SportScheduleBody(BaseModel):
     datetime: datetime.datetime
     sport: List[SportBody]
+

@@ -4,3 +4,4 @@ beanie
 python-decouple
 PyJWT
 bcrypt
+pymongo

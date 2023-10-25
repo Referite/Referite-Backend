@@ -4,12 +4,13 @@ from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from decouple import config
-from db import Sport, SportSchedule, SportType, RefereeID
+from db import sport_schedule_connection
 from auth.auth_handler import check_password, check_user, hash_password, create_access_token
 from auth.cookie import OAuth2PasswordBearerWithCookie
 from models import RefereeIdBody, SportScheduleBody
 from utils import error_handler
 from Enum.sportStatus import SportStatus
+from router import schedule
 import bcrypt
 
 app = FastAPI()
@@ -25,19 +26,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-@app.on_event('startup')
-async def connect_db():
-    client = AsyncIOMotorClient(config("MONGO_URL", cast=str, default="mongodb://localhost:27017"),
-                                tls=True,
-                                tlsAllowInvalidCertificates=True)
-
-    await init_beanie(database=client.referee, document_models=[SportType, SportSchedule, Sport, RefereeID])
+app.include_router(schedule.router)
 
 
-@app.get('/1')
-async def add_some_data():
-    # main way to add data
+@app.get('/mock')
+def add_some_data():
+    """mock data using this endpoint"""
     body1 = {
         "datetime": "2021-08-01T00:00:00",
         "sport": [{
@@ -67,65 +61,6 @@ async def add_some_data():
             "sport_type": None
         }]}
 
-    await SportSchedule(**body1).insert()
-    await SportSchedule(**body2).insert()
+    sport_schedule_connection.insert_many([body1, body2])
 
-
-@app.get('/2')
-async def add_data():
-    # alternative way to add data
-    sport_type_body = {
-        "type_id": 1,
-        "type_name": "12v11",
-        "status": SportStatus.CEREMONIES
-    }
-
-    sport_body = {
-        "sport_id": 1,
-        "sport_name": "Football",
-        "is_ceremonies": False,
-        "sport_type": [sport_type_body]
-    }
-
-    sport_schedule_body = {
-        "datetime": "2021-08-01T00:00:00",
-        "sport": [sport_body]
-    }
-
-    await Sport(**sport_body).insert()
-    await SportType(**sport_type_body).insert()
-    await SportSchedule(**sport_schedule_body).insert()
-
-@error_handler
-@app.post('/login/verify', status_code=201)
-async def login(response: Response, id_body: RefereeIdBody):
-    """
-    Receive username and password from body and check if user exists in database and password is correct
-    then set cookie with the access token that expires in 24 days, after that redirect to homepage
-    """
-    if await check_user(id_body) and await check_password(id_body):
-        access_token = create_access_token(id_body.username)
-        response = RedirectResponse(
-            url='/test/verify', status_code=302)  # change URL to homepage
-        response.set_cookie(key="access_token",
-                            value=f"Bearer {access_token}", httponly=True, expires=2073600)
-        return response
-    raise HTTPException(401, "Invalid credentials")
-
-
-@app.get('/test/verify', dependencies=[Depends(oauth2_scheme)])
-async def toast():
-    """Test JWT token and cookie"""
-    return {"message": "hello world"}
-
-
-@error_handler
-@app.post('/sport_schedule/add')
-async def add_sport_schedule(sport_schedule: SportScheduleBody):
-    schedule = SportSchedule(**sport_schedule.model_dump())
-    await schedule.insert()
-    return {
-        "status": "success",
-        "message": "Sport schedule added successfully",
-        "data": schedule
-    }
+    return {"message": "data mocked"}
