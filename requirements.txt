@@ -1,4 +1,3 @@
 fastapi[all]
-motor
-beanie
+pymongo
 python-decouple
