@@ -1,11 +1,13 @@
 from fastapi import FastAPI
-from router import schedule
+from router import schedule, record
 from db import sport_schedule_connection
 from Enum.sportStatus import SportStatus
 
 app = FastAPI()
 
 app.include_router(schedule.router)
+app.include_router(record.router)
+
 
 
 @app.get('/mock')
