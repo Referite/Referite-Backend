@@ -5,7 +5,7 @@ import bcrypt
 import jwt
 from decouple import config
 
-from db import RefereeID
+from db import referee_id_connection
 from models import RefereeIdBody
 
 
@@ -41,13 +41,13 @@ def get_decodeJWT(token: str) -> dict:
 
 async def check_user(id_body: RefereeIdBody):
     """Check if user exists in database return boolean"""
-    user = await RefereeID.find_one(RefereeID.username == str(id_body.username))
+    user = await referee_id_connection.find_one({"username" == str(id_body.username)})
     return user is not None
 
 
 async def check_password(id_body: RefereeIdBody):
     """Check if password is correct return boolean"""
-    password = await RefereeID.find_one(RefereeID.username == str(id_body.username))
+    password = await referee_id_connection.find_one({"username" == str(id_body.username)})
     return bool(bcrypt.checkpw(id_body.password.encode("utf-8"), password.password.encode("utf-8")))
     # return password is not None
 

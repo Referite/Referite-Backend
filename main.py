@@ -10,11 +10,10 @@ from auth.cookie import OAuth2PasswordBearerWithCookie
 from models import RefereeIdBody, SportScheduleBody
 from utils import error_handler
 from Enum.sportStatus import SportStatus
-from router import schedule
+from router import auth, schedule
 import bcrypt
 
 app = FastAPI()
-oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="/login/verify")
 
 origins = ["*"]
 
@@ -27,6 +26,7 @@ app.add_middleware(
 )
 
 app.include_router(schedule.router)
+app.include_router(auth.router)
 
 
 @app.get('/mock')
