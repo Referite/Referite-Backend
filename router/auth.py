@@ -24,7 +24,7 @@ async def login(response: Response, id_body: RefereeIdBody):
     Receive username and password from body and check if user exists in database and password is correct
     then set cookie with the access token that expires in 24 hour, after that redirect to homepage
     """
-    if check_user(id_body) and check_password(id_body):
+    if await check_user(id_body) and await check_password(id_body):
         access_token = create_access_token(id_body.username)
         response.set_cookie(key="access_token",
                             value=f"Bearer {access_token}", httponly=True, expires=86400)
