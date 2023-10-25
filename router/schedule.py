@@ -16,6 +16,7 @@ router = APIRouter(prefix='/api/schedule',
 @error_handler
 @router.post('/add', status_code=201)
 def add_sport_schedule(sport_schedule: SportScheduleBody):
+    """endpoint to add sport schedule into db"""
     sport_schedule_connection.insert_one(sport_schedule.model_dump())
     return {
         "status": "success",
