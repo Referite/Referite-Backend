@@ -1,7 +1,7 @@
 from typing import  Dict, Optional
 from fastapi.security import OAuth2
 from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
-from fastapi import Request,status,HTTPException
+from fastapi import Request,HTTPException
 from fastapi.security.utils import get_authorization_scheme_param
 
 class OAuth2PasswordBearerWithCookie(OAuth2):

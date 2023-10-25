@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Response
 from auth.auth_handler import check_password, check_user, create_access_token
 from auth.cookie import OAuth2PasswordBearerWithCookie
-from db import sport_schedule_connection
 import sys
 from pathlib import Path
 

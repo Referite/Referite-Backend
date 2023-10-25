@@ -1,17 +1,8 @@
-from beanie import init_beanie
-from fastapi import FastAPI, HTTPException, Depends, Response
-from fastapi.responses import RedirectResponse
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
-from decouple import config
 from db import sport_schedule_connection
-from auth.auth_handler import check_password, check_user, hash_password, create_access_token
-from auth.cookie import OAuth2PasswordBearerWithCookie
-from models import RefereeIdBody, SportScheduleBody
-from utils import error_handler
 from Enum.sportStatus import SportStatus
 from router import auth, schedule
-import bcrypt
 
 app = FastAPI()
 
