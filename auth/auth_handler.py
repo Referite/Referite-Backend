@@ -1,9 +1,11 @@
 import time
 from typing import Dict
 import bcrypt
+from fastapi import Depends, HTTPException
 
 import jwt
 from decouple import config
+from auth.cookie import OAuth2PasswordBearerWithCookie
 
 from db import referee_id_connection
 from models import RefereeIdBody
@@ -12,12 +14,7 @@ from models import RefereeIdBody
 JWT_SECRET = config("JWT_SECRET")
 JWT_ALGORITHM = config("JWT_ALGORITHM", default="HS256")
 COOKIE_NAME = config("COOKIE_NAME", default="access_token")
-
-
-def token_response(token: str):
-    return {
-        "access_token": token
-    }
+oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="/auth/token")
 
 
 def create_access_token(user_id: str) -> Dict[str, str]:
@@ -55,3 +52,11 @@ async def check_password(id_body: RefereeIdBody):
 def hash_password(id_body: RefereeIdBody):
     """Hash password"""
     return bcrypt.hashpw(id_body.password.encode("utf-8"), bcrypt.gensalt())
+
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = get_decodeJWT(token)
+        user = await referee_id_connection.find_one({"username": payload.get("user_id")}, {"_id": 0})
+    except:
+        raise HTTPException(401, "Invalid credentials")
+    return user
