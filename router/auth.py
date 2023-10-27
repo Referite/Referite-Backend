@@ -12,13 +12,13 @@ sys.path.append(str(package_root_directory))
 from models import RefereeIdBody, SportScheduleBody
 from utils import error_handler
 
-router = APIRouter(prefix='/auth',
+router = APIRouter(prefix='/api/auth',
                    tags=["auth"],
                    responses={ 404: {"description": "Not found"}})
 
 oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="/auth/token")
 
-SECURE = config("SECURE", default=False, cast=bool)
+COOKIE_SECURE = config("SECURE", default=False, cast=bool)
 
 @error_handler
 @router.post('/token', status_code=201)
@@ -30,7 +30,7 @@ async def login(response: Response, form_data:OAuth2PasswordRequestForm = Depend
     if await check_user(form_data) and await check_password(form_data):
         access_token = create_access_token(form_data.username)
         response.set_cookie(key="access_token",
-                            value=f"Bearer {access_token}", httponly=True, expires=3600, secure=SECURE)
+                            value=f"Bearer {access_token}", httponly=True, expires=3600, secure=COOKIE_SECURE)
         return {"message": "Login successful"}
     raise HTTPException(401, "Invalid credentials")
 
