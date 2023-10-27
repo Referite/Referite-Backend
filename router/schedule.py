@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from db import sport_schedule_connection
+from db import sport_schedule_connection, sport_connection
 import sys
 from pathlib import Path
 
@@ -37,3 +37,13 @@ def get_schedule():
             sport["sport_status"] = calculate_sport_status(sport["sport_type"])
 
     return {"schedule_list": current_schedule}
+
+@error_handler
+@router.get('/sport')
+def get_all_sport():
+    """
+    get all sport
+    """
+    all_sport = list(sport_connection.find({}, {"sport_type": 0, "_id": 0}))
+    
+    return {"sport_list": all_sport}
