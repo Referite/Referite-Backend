@@ -56,7 +56,8 @@ def hash_password(id_body: RefereeIdBody):
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         payload = get_decodeJWT(token)
-        user = await referee_id_connection.find_one({"username": payload.get("user_id")}, {"_id": 0})
-    except:
+        user = referee_id_connection.find_one({"username": payload.get("user_id")}, {"password":0, "_id": 0})
+    except Exception as e:
+        print(e)
         raise HTTPException(401, "Invalid credentials")
     return user

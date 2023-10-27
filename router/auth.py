@@ -31,7 +31,7 @@ async def login(response: Response, form_data:OAuth2PasswordRequestForm = Depend
         access_token = create_access_token(form_data.username)
         response.set_cookie(key="access_token",
                             value=f"Bearer {access_token}", httponly=True, expires=3600, secure=COOKIE_SECURE)
-        return {"message": "Login successful"}
+        return {"access_token": access_token}
     raise HTTPException(401, "Invalid credentials")
 
 @error_handler
