@@ -16,7 +16,7 @@ router = APIRouter(prefix='/api/auth',
                    tags=["auth"],
                    responses={ 404: {"description": "Not found"}})
 
-oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="/auth/token")
+oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="api/auth/token")
 
 COOKIE_SECURE = config("SECURE", default=False, cast=bool)
 

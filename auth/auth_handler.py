@@ -14,7 +14,7 @@ from models import RefereeIdBody
 JWT_SECRET = config("JWT_SECRET")
 JWT_ALGORITHM = config("JWT_ALGORITHM", default="HS256")
 COOKIE_NAME = config("COOKIE_NAME", default="access_token")
-oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="/auth/token")
+oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="api/auth/token")
 
 
 def create_access_token(user_id: str) -> Dict[str, str]:
