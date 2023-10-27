@@ -1,3 +1,5 @@
 fastapi[all]
-pymongo
 python-decouple
+PyJWT
+bcrypt
+pymongo

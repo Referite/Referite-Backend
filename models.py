@@ -3,6 +3,9 @@ from Enum.sportStatus import SportStatus
 from typing import List, Optional
 import datetime
 
+class RefereeIdBody(BaseModel):
+    username: str
+    password: str
 class SportTypeBody(BaseModel):
     type_id: int
     type_name: str
