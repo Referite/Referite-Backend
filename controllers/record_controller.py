@@ -20,6 +20,9 @@ def get_ioc_data(sport_id: int):
     return ioc_data
 
 def find_date_of_that_sport_type(schedule_data, type_id):
+        """
+        Find date of that sport type in schedule data
+        """
         for schedule in schedule_data:
             for sport in schedule['sport']:
                 for sport_type in sport['sport_type']:
