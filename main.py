@@ -1,12 +1,25 @@
 from fastapi import FastAPI
 from router import schedule, record
+from fastapi.middleware.cors import CORSMiddleware
 from db import sport_schedule_connection
 from Enum.sportStatus import SportStatus
+from router import auth, schedule
 
 app = FastAPI()
 
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(schedule.router)
 app.include_router(record.router)
+app.include_router(auth.router)
 
 
 
