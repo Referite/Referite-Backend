@@ -1,11 +1,7 @@
 from fastapi import APIRouter
 from db import sport_schedule_connection
-import sys
-from pathlib import Path
 
-file = Path(__file__).resolve()
-package_root_directory = file.parents[1]
-sys.path.append(str(package_root_directory))
+
 from models import SportScheduleBody
 from utils import error_handler, calculate_sport_status
 

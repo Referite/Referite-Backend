@@ -24,3 +24,15 @@ class SportBody(BaseModel):
 class SportScheduleBody(BaseModel):
     datetime: datetime.datetime
     sport: List[SportBody]
+
+class SportTypeRecordBody(BaseModel):
+    type_id: int
+    type_name: str
+    competition_date: datetime.date
+    participating_country_count: int
+    participating_country: List[str]
+
+class RecordBody(BaseModel):
+    sport_id: int
+    sport_name: str
+    sport_types: List[SportTypeRecordBody]
