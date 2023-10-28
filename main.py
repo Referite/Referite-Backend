@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from router import schedule, record
 from fastapi.middleware.cors import CORSMiddleware
 from db import sport_schedule_connection
 from Enum.sportStatus import SportStatus
@@ -17,7 +18,9 @@ app.add_middleware(
 )
 
 app.include_router(schedule.router)
+app.include_router(record.router)
 app.include_router(auth.router)
+
 
 
 @app.get('/mock')
