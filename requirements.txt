@@ -3,3 +3,4 @@ python-decouple
 PyJWT
 bcrypt
 pymongo
+requests
