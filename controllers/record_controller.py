@@ -38,7 +38,7 @@ def record_medal_default_restriction(gold, silver, bronze):
     warning = {}
     message = {"Message": "Medal allocation successful."}
     total_medals = gold + silver + bronze
-    if total_medals > 3:
+    if total_medals != 3:
         warning["Warning"] = "Medal allocation deviates from default logic."
     invalid_combinations = [
         (gold >= 3 and silver + bronze > 0),
@@ -58,7 +58,7 @@ def record_medal_repechage_restriction(gold, silver, bronze):
     warning = {}
     message = {"Message": "Medal allocation successful."}
     total_medals = gold + silver + bronze
-    if total_medals > 4:
+    if total_medals != 4:
         warning["Warning"] = "Medal allocation deviates from default logic."
     invalid_combinations = [
         (gold >= 4 and silver + bronze > 0),
