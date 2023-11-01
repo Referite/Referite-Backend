@@ -1,6 +1,6 @@
 from pydantic import BaseModel, validator, field_validator
 from Enum.sportStatus import SportStatus
-from typing import List, Optional
+from typing import List, Optional, Dict
 import datetime
 
 class RefereeIdBody(BaseModel):
@@ -47,3 +47,16 @@ class RecordBody(BaseModel):
     sport_id: int
     sport_name: str
     sport_types: List[SportTypeRecordBody]
+
+class MedalBody(BaseModel):
+    gold: int
+    silver: int
+    bronze: int
+
+class ParticipantBody(BaseModel):
+    country: str
+    medal: List[MedalBody]
+
+class VerifyBody(BaseModel):
+    sport_name: str
+    participant: List[ParticipantBody]
