@@ -37,15 +37,15 @@ def record_medal_default_restriction(gold_medal, silver_medal, bronze_medal):
     """Record medal from application with default restrictions"""
     warning = {}
     message = {"Message": "Medal allocation successful."}
-    if gold_medal + silver_medal + bronze_medal > 3:
-        # Issue a warning message, but continue with medal allocation
+    total_medals = gold_medal + silver_medal + bronze_medal
+    if total_medals > 3:
         warning["Warning"] = "Medal allocation deviates from default logic."
-
-    if gold_medal >= 3 and silver_medal + bronze_medal > 0:
-        raise HTTPException(400, "Invalid medal allocation.")
-    elif gold_medal == 2 and silver_medal > 0:
-        raise HTTPException(400, "Invalid medal allocation.")
-    elif gold_medal == 1 and silver_medal >= 2 and bronze_medal > 0:
+    invalid_combinations = [
+        (gold_medal >= 3 and silver_medal + bronze_medal > 0),
+        (gold_medal == 2 and silver_medal > 0),
+        (gold_medal == 1 and silver_medal >= 2 and bronze_medal > 0),
+    ]
+    if any(invalid_combinations):
         raise HTTPException(400, "Invalid medal allocation.")
     return warning, message
 
@@ -57,19 +57,16 @@ def record_medal_repechage_restriction(gold_medal, silver_medal, bronze_medal):
     """
     warning = {}
     message = {"Message": "Medal allocation successful."}
-    if gold_medal + silver_medal + bronze_medal > 4:
-        # Issue a warning message, but continue with medal allocation
+    total_medals = gold_medal + silver_medal + bronze_medal
+    if total_medals > 4:
         warning["Warning"] = "Medal allocation deviates from default logic."
-
-    if gold_medal >= 4 and silver_medal + bronze_medal > 0:
-        raise HTTPException(400, "Invalid medal allocation.")
-    elif gold_medal == 3 and silver_medal > 0:
-        raise HTTPException(400, "Invalid medal allocation.")
-    elif gold_medal == 2 and silver_medal >= 2 and bronze_medal > 0:
-        raise HTTPException(400, "Invalid medal allocation.")
-    elif gold_medal == 1 and silver_medal >= 3 and bronze_medal > 0:
+    invalid_combinations = [
+        (gold_medal >= 4 and silver_medal + bronze_medal > 0),
+        (gold_medal == 3 and silver_medal > 0),
+        (gold_medal == 2 and silver_medal >= 2 and bronze_medal > 0),
+        (gold_medal == 1 and silver_medal >= 3 and bronze_medal > 0),
+    ]
+    if any(invalid_combinations):
         raise HTTPException(400, "Invalid medal allocation.")
     return warning, message
-
-
 
