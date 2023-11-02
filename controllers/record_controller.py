@@ -35,12 +35,10 @@ def find_date_of_that_sport_type(schedule_data, type_id):
 
 def record_medal_default_restriction(country_name, gold, silver, bronze):
     """Record medal from application with default restrictions"""
-    message = {"Warning": "", "Message": "Medal allocation successful."}
-    warning_countries = []
+    warning_country = ''
     total_medals = gold + silver + bronze
     if total_medals != 3:
-        warning_countries.append(country_name)
-        message["Warning"] = f"Medal allocation for {warning_countries} deviates from default logic."
+        warning_country = country_name
     invalid_combinations = [
         (gold >= 3 and silver + bronze > 0),
         (gold == 2 and silver > 0),
@@ -48,9 +46,7 @@ def record_medal_default_restriction(country_name, gold, silver, bronze):
     ]
     if any(invalid_combinations):
         raise HTTPException(400, "Invalid medal allocation.")
-    if warning_countries:
-        message["Warning"] = f"Medal allocation for {warning_countries} deviates from default logic."
-    return message
+    return warning_country
 
 
 def record_medal_repechage_restriction(country_name, gold, silver, bronze):
@@ -58,11 +54,10 @@ def record_medal_repechage_restriction(country_name, gold, silver, bronze):
     Record medal from application with repêchage restrictions with bronze medal playoff
     (ref: https://en.wikipedia.org/wiki/List_of_ties_for_medals_at_the_Olympics#Ties_not_included_in_this_list)
     """
-    message = {"Warning": "", "Message": "Medal allocation successful."}
-    warning_countries = []
+    warning_country = ''
     total_medals = gold + silver + bronze
     if total_medals != 4:
-        warning_countries.append(country_name)
+        warning_country = country_name
     invalid_combinations = [
         (gold >= 4 and silver + bronze > 0),
         (gold == 3 and silver > 0),
@@ -71,7 +66,5 @@ def record_medal_repechage_restriction(country_name, gold, silver, bronze):
     ]
     if any(invalid_combinations):
         raise HTTPException(400, "Invalid medal allocation.")
-    if warning_countries:
-        message["Warning"] = f"Medal allocation for {warning_countries} deviates from default logic."
-    return message
+    return warning_country
 

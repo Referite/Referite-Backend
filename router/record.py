@@ -23,6 +23,7 @@ def get_detail(sport_id: int):
 
     return resp
 
+
 @error_handler
 @router.post('/verify')
 def verify_medal(verify_body: VerifyBody):
@@ -35,12 +36,20 @@ def verify_medal(verify_body: VerifyBody):
     verify = verify_body.model_dump()
     sport_name, participant = verify['sport_name'], verify['participant']
     repechage_list = ["wrestling", "boxing", "judo", "taekwondo"]
-
+    warning_countries = []
+    message = {"Warning": "", "Message": "Medal allocation successful."}
     for country in participant:
         country_name = country['country']
         gold = country['medal']['gold']
         silver = country['medal']['silver']
         bronze = country['medal']['bronze']
         if sport_name.lower() in repechage_list:
-            return record_medal_repechage_restriction(country_name, gold, silver, bronze)
-        return record_medal_default_restriction(country_name, gold, silver, bronze)
+            warning_country = record_medal_repechage_restriction(country_name, gold, silver, bronze)
+            warning_countries.append(warning_country)
+        else:
+            warning_country = record_medal_default_restriction(country_name, gold, silver, bronze)
+            if warning_country != '':
+                warning_countries.append(warning_country)
+    if warning_countries:
+        message["Warning"] = f"Medal allocation for {warning_countries} deviates from default logic."
+    return message
