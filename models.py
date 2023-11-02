@@ -41,7 +41,7 @@ class SportTypeRecordBody(BaseModel):
     type_name: str
     competition_date: datetime.date
     participating_country_count: int
-    participating_country: List[str]
+    participating_countries: List[str]
 
 class RecordBody(BaseModel):
     sport_id: int
