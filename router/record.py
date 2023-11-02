@@ -29,9 +29,8 @@ def verify_medal(verify_body: VerifyBody):
     """Record medal verification if it meets any restrictions and warn accordingly"""
     verify = verify_body.model_dump()
     sport_name, participant = itemgetter('sport_name', 'participant')(verify)
-    medal = itemgetter('medal')(participant)
-    gold, silver, bronze = itemgetter('gold', 'silver', 'bronze')(medal)
     repechage_list = ["wrestling", "boxing", "judo", "taekwondo"]
+    gold, silver, bronze = participant["medal"]["gold"], participant["medal"]["silver"], participant["medal"]["bronze"]
     if sport_name.lower() in repechage_list:                                # return twos dict: warning, message
         return record_medal_repechage_restriction(gold, silver, bronze)     # warning = {"Warning": "message"}
     return record_medal_default_restriction(gold, silver, bronze)           # message = {"Message": "message"}
