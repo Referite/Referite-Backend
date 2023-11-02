@@ -35,11 +35,10 @@ def find_date_of_that_sport_type(schedule_data, type_id):
 
 def record_medal_default_restriction(country_name, gold, silver, bronze):
     """Record medal from application with default restrictions"""
-    warning = {}
-    message = {"Message": "Medal allocation successful."}
+    message = {"Warning": "", "Message": "Medal allocation successful."}
     total_medals = gold + silver + bronze
     if total_medals != 3:
-        warning["Warning"] = f"Medal allocation for {country_name} deviates from default logic."
+        message["Warning"] = f"Medal allocation for {country_name} deviates from default logic."
     invalid_combinations = [
         (gold >= 3 and silver + bronze > 0),
         (gold == 2 and silver > 0),
@@ -47,7 +46,7 @@ def record_medal_default_restriction(country_name, gold, silver, bronze):
     ]
     if any(invalid_combinations):
         raise HTTPException(400, "Invalid medal allocation.")
-    return warning, message
+    return message
 
 
 def record_medal_repechage_restriction(country_name, gold, silver, bronze):
@@ -55,11 +54,10 @@ def record_medal_repechage_restriction(country_name, gold, silver, bronze):
     Record medal from application with repêchage restrictions with bronze medal playoff
     (ref: https://en.wikipedia.org/wiki/List_of_ties_for_medals_at_the_Olympics#Ties_not_included_in_this_list)
     """
-    warning = {}
-    message = {"Message": "Medal allocation successful."}
+    message = {"Warning": "", "Message": "Medal allocation successful."}
     total_medals = gold + silver + bronze
     if total_medals != 4:
-        warning["Warning"] = f"Medal allocation for {country_name} deviates from default logic."
+        message["Warning"] = f"Medal allocation for {country_name} deviates from default logic."
     invalid_combinations = [
         (gold >= 4 and silver + bronze > 0),
         (gold == 3 and silver > 0),
@@ -68,5 +66,5 @@ def record_medal_repechage_restriction(country_name, gold, silver, bronze):
     ]
     if any(invalid_combinations):
         raise HTTPException(400, "Invalid medal allocation.")
-    return warning, message
+    return message
 
