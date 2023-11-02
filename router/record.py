@@ -12,7 +12,8 @@ router = APIRouter(
 )
 
 
-@router.get('/detail/{sport_id}')
+@error_handler
+@router.get('/detail/{sport_id}', response_model=RecordBody)
 def get_detail(sport_id: int):
     """Retrieve sport detail by sport ID and match it with schedule data."""
     resp = get_ioc_data(sport_id)
