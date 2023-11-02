@@ -48,6 +48,8 @@ def record_medal_default_restriction(country_name, gold, silver, bronze):
     ]
     if any(invalid_combinations):
         raise HTTPException(400, "Invalid medal allocation.")
+    if warning_countries:
+        message["Warning"] = f"Medal allocation for {warning_countries} deviates from default logic."
     return message
 
 
@@ -61,7 +63,6 @@ def record_medal_repechage_restriction(country_name, gold, silver, bronze):
     total_medals = gold + silver + bronze
     if total_medals != 4:
         warning_countries.append(country_name)
-        message["Warning"] = f"Medal allocation for {warning_countries} deviates from default logic."
     invalid_combinations = [
         (gold >= 4 and silver + bronze > 0),
         (gold == 3 and silver > 0),
@@ -70,5 +71,7 @@ def record_medal_repechage_restriction(country_name, gold, silver, bronze):
     ]
     if any(invalid_combinations):
         raise HTTPException(400, "Invalid medal allocation.")
+    if warning_countries:
+        message["Warning"] = f"Medal allocation for {warning_countries} deviates from default logic."
     return message
 
