@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from operator import itemgetter
 from models import RecordBody, VerifyBody
+from utils import error_handler
 from db import sport_schedule_connection
 from controllers.record_controller import get_ioc_data, find_date_of_that_sport_type, record_medal_default_restriction, record_medal_repechage_restriction
 
@@ -23,8 +23,8 @@ def get_detail(sport_id: int):
 
     return resp
 
-
-@router.get('/verify')
+@error_handler
+@router.post('/verify')
 def verify_medal(verify_body: VerifyBody):
     """
     Record medal verification if it meets any restrictions and warn accordingly
@@ -33,8 +33,9 @@ def verify_medal(verify_body: VerifyBody):
     message = {"Message": "message"}
     """
     verify = verify_body.model_dump()
-    sport_name, participant = itemgetter('sport_name', 'participant')(verify)
+    sport_name, participant = verify['sport_name'], verify['participant']
     repechage_list = ["wrestling", "boxing", "judo", "taekwondo"]
+
     for country in participant:
         country_name = country['country']
         gold = country['medal']['gold']
@@ -43,4 +44,3 @@ def verify_medal(verify_body: VerifyBody):
         if sport_name.lower() in repechage_list:
             return record_medal_repechage_restriction(country_name, gold, silver, bronze)
         return record_medal_default_restriction(country_name, gold, silver, bronze)
-

@@ -55,7 +55,7 @@ class MedalBody(BaseModel):
 
 class ParticipantBody(BaseModel):
     country: str
-    medal: List[MedalBody]
+    medal: MedalBody
 
 class VerifyBody(BaseModel):
     sport_name: str
