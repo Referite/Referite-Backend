@@ -65,6 +65,6 @@ def record_medal_repechage_restriction(country_name, gold, silver, bronze):
         (gold == 1 and silver >= 3 and bronze > 0),
     ]
     if any(invalid_combinations):
-        raise HTTPException(400, "Invalid medal allocation.")
+        raise HTTPException(400, f"Invalid medal allocation for {country_name}.")
     return warning_country
 
