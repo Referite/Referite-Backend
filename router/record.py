@@ -26,12 +26,21 @@ def get_detail(sport_id: int):
 
 @router.get('/verify')
 def verify_medal(verify_body: VerifyBody):
-    """Record medal verification if it meets any restrictions and warn accordingly"""
+    """
+    Record medal verification if it meets any restrictions and warn accordingly
+    return twos dict: warning, message in this order
+    warning = {"Warning": "message"} or warning = {} depends on if it needs to warn or not
+    message = {"Message": "message"}
+    """
     verify = verify_body.model_dump()
     sport_name, participant = itemgetter('sport_name', 'participant')(verify)
     repechage_list = ["wrestling", "boxing", "judo", "taekwondo"]
-    gold, silver, bronze = participant["medal"]["gold"], participant["medal"]["silver"], participant["medal"]["bronze"]
-    if sport_name.lower() in repechage_list:                                # return twos dict: warning, message
-        return record_medal_repechage_restriction(gold, silver, bronze)     # warning = {"Warning": "message"}
-    return record_medal_default_restriction(gold, silver, bronze)           # message = {"Message": "message"}
+    for country in participant:
+        country_name = country['country']
+        gold = country['medal']['gold']
+        silver = country['medal']['silver']
+        bronze = country['medal']['bronze']
+        if sport_name.lower() in repechage_list:
+            return record_medal_repechage_restriction(country_name, gold, silver, bronze)
+        return record_medal_default_restriction(country_name, gold, silver, bronze)
 
