@@ -8,7 +8,8 @@ from utils import error_handler, calculate_sport_status
 
 router = APIRouter(prefix='/api/schedule',
                    tags=["schedule"],
-                   responses={ 404: {"description": "Not found"}})
+                   responses={404: {"description": "Not found"}})
+
 
 @error_handler
 @router.post('/add', status_code=201)
@@ -20,6 +21,7 @@ def add_sport_schedule(sport_schedule: SportScheduleBody):
         "message": "Sport schedule added successfully",
         "data": sport_schedule
     }
+
 
 @error_handler
 @router.get('/all')
@@ -35,6 +37,7 @@ def get_schedule():
 
     return {"schedule_list": current_schedule}
 
+
 @error_handler
 @router.get('/sport')
 def get_all_sport():
@@ -42,5 +45,5 @@ def get_all_sport():
     get all sport
     """
     all_sport = list(sport_connection.find({}, {"sport_type": 0, "_id": 0}))
-    
+
     return {"sport_list": all_sport}

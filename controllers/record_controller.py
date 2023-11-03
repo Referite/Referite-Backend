@@ -11,12 +11,14 @@ def get_ioc_data(sport_id: int):
         raise HTTPException(400, f"something went wrong with ioc_data: {e}")
     else:
         for sport_type in ioc_data['sport_types']:
-            sport_type['participating_country_count'] = len(sport_type['participating_countries'])
+            sport_type['participating_country_count'] = len(
+                sport_type['participating_countries'])
 
     del ioc_data["sport_summary"]
 
     for sport_type in ioc_data['sport_types']:
-        sport_type['participating_country_count'] = len(sport_type['participating_countries'])
+        sport_type['participating_country_count'] = len(
+            sport_type['participating_countries'])
 
     return ioc_data
 
@@ -33,43 +35,38 @@ def find_date_of_that_sport_type(schedule_data, type_id):
     raise Exception("No sport that matches you request type_id")
 
 
-def record_medal_default_restriction(gold_medal, silver_medal, bronze_medal):
+def record_medal_default_restriction(country_name, gold, silver, bronze):
     """Record medal from application with default restrictions"""
-    warning = {}
-    message = {"Message": "Medal allocation successful."}
-    if gold_medal + silver_medal + bronze_medal > 3:
-        # Issue a warning message, but continue with medal allocation
-        warning["Warning"] = "Medal allocation deviates from default logic."
-
-    if gold_medal >= 3 and silver_medal + bronze_medal > 0:
+    warning_country = ''
+    total_medals = gold + silver + bronze
+    if total_medals != 3:
+        warning_country = country_name
+    invalid_combinations = [
+        (gold >= 3 and silver + bronze > 0),
+        (gold == 2 and silver > 0),
+        (gold == 1 and silver >= 2 and bronze > 0),
+    ]
+    if any(invalid_combinations):
         raise HTTPException(400, "Invalid medal allocation.")
-    elif gold_medal == 2 and silver_medal > 0:
-        raise HTTPException(400, "Invalid medal allocation.")
-    elif gold_medal == 1 and silver_medal >= 2 and bronze_medal > 0:
-        raise HTTPException(400, "Invalid medal allocation.")
-    return warning, message
+    return warning_country
 
 
-def record_medal_repechage_restriction(gold_medal, silver_medal, bronze_medal):
+def record_medal_repechage_restriction(country_name, gold, silver, bronze):
     """
     Record medal from application with repêchage restrictions with bronze medal playoff
     (ref: https://en.wikipedia.org/wiki/List_of_ties_for_medals_at_the_Olympics#Ties_not_included_in_this_list)
     """
-    warning = {}
-    message = {"Message": "Medal allocation successful."}
-    if gold_medal + silver_medal + bronze_medal > 4:
-        # Issue a warning message, but continue with medal allocation
-        warning["Warning"] = "Medal allocation deviates from default logic."
-
-    if gold_medal >= 4 and silver_medal + bronze_medal > 0:
-        raise HTTPException(400, "Invalid medal allocation.")
-    elif gold_medal == 3 and silver_medal > 0:
-        raise HTTPException(400, "Invalid medal allocation.")
-    elif gold_medal == 2 and silver_medal >= 2 and bronze_medal > 0:
-        raise HTTPException(400, "Invalid medal allocation.")
-    elif gold_medal == 1 and silver_medal >= 3 and bronze_medal > 0:
-        raise HTTPException(400, "Invalid medal allocation.")
-    return warning, message
-
-
-
+    warning_country = ''
+    total_medals = gold + silver + bronze
+    if total_medals != 4:
+        warning_country = country_name
+    invalid_combinations = [
+        (gold >= 4 and silver + bronze > 0),
+        (gold == 3 and silver > 0),
+        (gold == 2 and silver >= 2 and bronze > 0),
+        (gold == 1 and silver >= 3 and bronze > 0),
+    ]
+    if any(invalid_combinations):
+        raise HTTPException(
+            400, f"Invalid medal allocation for {country_name}.")
+    return warning_country

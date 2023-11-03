@@ -22,6 +22,15 @@ app.include_router(record.router)
 app.include_router(auth.router)
 
 
+@app.get('/')
+def index():
+    return {"message": "Hello from Refrite✌️"}
+
+
+@app.get('/api')
+def api():
+    return {"message": "Hello from Refrite✌️"}
+
 
 @app.get('/mock')
 def add_some_data():

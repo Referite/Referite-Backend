@@ -1,6 +1,7 @@
 from Enum.sportStatus import SportStatus
 from typing import List, Dict
 
+
 def error_handler(f):
     def wrapper(*arg, **kwargs):
         try:
@@ -11,6 +12,7 @@ def error_handler(f):
                 "message": str(e)
             }
     return wrapper
+
 
 def calculate_sport_status(sport_types: List[Dict]):
     """
