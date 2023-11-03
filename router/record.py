@@ -17,10 +17,12 @@ router = APIRouter(
 def get_detail(sport_id: int):
     """Retrieve sport detail by sport ID and match it with schedule data."""
     resp = get_ioc_data(sport_id)
-    current_schedule = list(sport_schedule_connection.find(filter={"sport.sport_id": sport_id, "sport.sport_type.type_id": 2}, projection={'_id': 0, 'sport.sport_type._id': 0, 'sport.revision_id': 0, 'sport.sport_type.revision_id': 0, 'sport._id': 0}))
+    current_schedule = list(sport_schedule_connection.find(filter={"sport.sport_id": sport_id, "sport.sport_type.type_id": 2}, projection={
+                            '_id': 0, 'sport.sport_type._id': 0, 'sport.revision_id': 0, 'sport.sport_type.revision_id': 0, 'sport._id': 0}))
 
     for types in resp['sport_types']:
-         types["competition_date"] = find_date_of_that_sport_type(current_schedule, types['type_id'])
+        types["competition_date"] = find_date_of_that_sport_type(
+            current_schedule, types['type_id'])
 
     return resp
 
@@ -45,10 +47,12 @@ def verify_medal(verify_body: VerifyBody):
         silver = country['medal']['silver']
         bronze = country['medal']['bronze']
         if sport_name.lower() in repechage_list:
-            warning_country = record_medal_repechage_restriction(country_name, gold, silver, bronze)
+            warning_country = record_medal_repechage_restriction(
+                country_name, gold, silver, bronze)
             warning_countries.append(warning_country)
         else:
-            warning_country = record_medal_default_restriction(country_name, gold, silver, bronze)
+            warning_country = record_medal_default_restriction(
+                country_name, gold, silver, bronze)
             if warning_country != '':
                 warning_countries.append(warning_country)
     if warning_countries:

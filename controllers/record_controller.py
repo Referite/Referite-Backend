@@ -11,12 +11,14 @@ def get_ioc_data(sport_id: int):
         raise HTTPException(400, f"something went wrong with ioc_data: {e}")
     else:
         for sport_type in ioc_data['sport_types']:
-            sport_type['participating_country_count'] = len(sport_type['participating_countries'])
+            sport_type['participating_country_count'] = len(
+                sport_type['participating_countries'])
 
     del ioc_data["sport_summary"]
 
     for sport_type in ioc_data['sport_types']:
-        sport_type['participating_country_count'] = len(sport_type['participating_countries'])
+        sport_type['participating_country_count'] = len(
+            sport_type['participating_countries'])
 
     return ioc_data
 
@@ -65,6 +67,6 @@ def record_medal_repechage_restriction(country_name, gold, silver, bronze):
         (gold == 1 and silver >= 3 and bronze > 0),
     ]
     if any(invalid_combinations):
-        raise HTTPException(400, f"Invalid medal allocation for {country_name}.")
+        raise HTTPException(
+            400, f"Invalid medal allocation for {country_name}.")
     return warning_country
-
