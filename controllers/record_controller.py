@@ -1,5 +1,8 @@
 import requests
 from fastapi import HTTPException
+from typing import Dict
+from Enum.sportStatus import SportStatus
+from db import sport_schedule_connection
 
 
 def get_ioc_data(sport_id: int):
@@ -70,3 +73,14 @@ def record_medal_repechage_restriction(country_name, gold, silver, bronze):
         raise HTTPException(
             400, f"Invalid medal allocation for {country_name}.")
     return warning_country
+
+
+def update_status(sport_id: int, sport_type_id: int, status: SportStatus):
+    """Update sport type status in sport schedule"""
+    try:
+        sport_schedule_connection.update_one({"_id": sport_id, }, {"$set": {"sport.$.sport_type.$.status": status}})
+    except Exception as e:
+        raise HTTPException(400, f"something went wrong with sport_type_id: {e}")
+    else:
+        return {"Message": "Status updated successfully."}
+# def update_medal_to_ioc(medal: Dict):

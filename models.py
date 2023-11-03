@@ -72,3 +72,11 @@ class ParticipantBody(BaseModel):
 class VerifyBody(BaseModel):
     sport_name: str
     participant: List[ParticipantBody]
+
+class IocMedalBody(BaseModel):
+    sport_id: int
+    sport_name: str
+    sport_type_id: int
+    sport_type: str
+    participant: List[ParticipantBody]
+
