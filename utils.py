@@ -1,5 +1,6 @@
+from typing import Dict, List
+
 from Enum.sportStatus import SportStatus
-from typing import List, Dict
 
 
 def error_handler(f):
@@ -7,10 +8,8 @@ def error_handler(f):
         try:
             return f(*arg, **kwargs)
         except Exception as e:
-            return {
-                "status": "error",
-                "message": str(e)
-            }
+            return {"status": "error", "message": str(e)}
+
     return wrapper
 
 
