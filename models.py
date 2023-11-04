@@ -1,7 +1,9 @@
-from pydantic import BaseModel, validator, field_validator
-from Enum.sportStatus import SportStatus
-from typing import List, Optional, Dict
 import datetime
+from typing import Dict, List, Optional
+
+from pydantic import BaseModel, field_validator, validator
+
+from Enum.sportStatus import SportStatus
 
 
 class RefereeIdBody(BaseModel):
@@ -14,14 +16,15 @@ class SportTypeBody(BaseModel):
     type_name: str
     status: str
 
-    @field_validator('status')
+    @field_validator("status")
     @classmethod
     def status_must_be_enum(cls, v: str):
         try:
             SportStatus(v)
         except AssertionError as e:
             raise ValueError(
-                "status must be ['CEREMONIES', 'COMPETITIVE', 'TROPHY', 'RECORDED']")
+                "status must be ['CEREMONIES', 'COMPETITIVE', 'TROPHY', 'RECORDED']"
+            )
         return v
 
 
@@ -31,11 +34,12 @@ class SportBody(BaseModel):
     sport_type: Optional[List[SportTypeBody]]
     is_ceremonies: bool
 
-    @validator('sport_type', always=True)
+    @validator("sport_type", always=True)
     def validate(cls, value, values):
         if values.get("is_ceremonies") and value:
             raise ValueError(
-                "sport_type should not be present when is_ceremonies is True")
+                "sport_type should not be present when is_ceremonies is True"
+            )
         return value
 
 
@@ -71,4 +75,10 @@ class ParticipantBody(BaseModel):
 
 class VerifyBody(BaseModel):
     sport_name: str
-    participant: List[ParticipantBody]
+    participants: List[ParticipantBody]
+
+
+class IocMedalBody(BaseModel):
+    sport_id: int
+    sport_type_id: int
+    participants: List[ParticipantBody]

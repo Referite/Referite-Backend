@@ -6,3 +6,6 @@ class SportStatus(Enum):
     COMPETITIVE = "COMPETITIVE"
     TROPHY = "TROPHY"
     RECORDED = "RECORDED"
+
+    def __str__(self):
+        return self.value
