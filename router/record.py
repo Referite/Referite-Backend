@@ -52,7 +52,7 @@ def verify_medal(verify_body: VerifyBody):
     message = {"Message": "message"}
     """
     verify = verify_body.model_dump()
-    sport_name, participant = verify["sport_name"], verify["participant"]
+    sport_name, participant = verify["sport_name"], verify["participants"]
     repechage_list = ["wrestling", "boxing", "judo", "taekwondo"]
     warning_countries = []
     message = {"Warning": "", "Message": "Medal allocation successful."}
