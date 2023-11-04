@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from models import RecordBody, VerifyBody, IocMedalBody
 from utils import error_handler
 from db import sport_schedule_connection
-from controllers.record_controller import get_ioc_data, find_date_of_that_sport_type, record_medal_default_restriction, record_medal_repechage_restriction
+from controllers.record_controller import get_ioc_data, find_date_of_that_sport_type, record_medal_default_restriction, record_medal_repechage_restriction, update_medal_to_ioc
 
 
 router = APIRouter(
@@ -58,8 +58,10 @@ def verify_medal(verify_body: VerifyBody):
         message["Warning"] = f"Medal allocation for {warning_countries} deviates from default logic."
     return message
 
-# @router.put('/medal/update/')
-# def update_medal(medal: IocMedalBody):
-
-# @router.put('/sport/update/')
-# def update()
+@error_handler
+@router.post('/medal/update')
+def update(ioc_medal_body: IocMedalBody):
+    """
+    Update medal allocation in sota database
+    """
+    return update_medal_to_ioc(ioc_medal_body.model_dump())

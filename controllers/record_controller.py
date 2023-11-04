@@ -3,6 +3,8 @@ from fastapi import HTTPException
 from typing import Dict
 from Enum.sportStatus import SportStatus
 from db import sport_schedule_connection
+from decouple import config
+from Enum.sportStatus import SportStatus
 
 
 def get_ioc_data(sport_id: int):
@@ -10,6 +12,7 @@ def get_ioc_data(sport_id: int):
     try:
         resp = requests.get(f'https://sota-backend.fly.dev/sport/{sport_id}')
         ioc_data = resp.json()
+        print(ioc_data)
     except Exception as e:
         raise HTTPException(400, f"something went wrong with ioc_data: {e}")
     else:
@@ -78,9 +81,28 @@ def record_medal_repechage_restriction(country_name, gold, silver, bronze):
 def update_status(sport_id: int, sport_type_id: int, status: SportStatus):
     """Update sport type status in sport schedule"""
     try:
-        sport_schedule_connection.update_one({"_id": sport_id, }, {"$set": {"sport.$.sport_type.$.status": status}})
+        sport_schedule_connection.update_one({"sport.sport_id": sport_id, 'sport.sport_type.type_id': sport_type_id}, {"$set": {'sport.$[i].sport_type.$[j].status': status}}, array_filters=[{'i.sport_id': sport_id},
+                                                                                                                                                                                              {'j.type_id': sport_id}])
     except Exception as e:
-        raise HTTPException(400, f"something went wrong with sport_type_id: {e}")
+        raise HTTPException(400, f"something went wrong: {e}")
     else:
         return {"Message": "Status updated successfully."}
-# def update_medal_to_ioc(medal: Dict):
+
+
+def update_medal_to_ioc(medal: Dict):
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {config("IOC_ACCESS_TOKEN", cast=str, default="")}'
+    }
+
+    resp = requests.post('https://sota-backend.fly.dev/medals/update_medal',
+                         headers=headers, json=medal)
+
+    if resp.status_code != 200:
+        return resp.json()
+    data = resp.json()['Success']
+
+    update_status(data['sport_id'], data['sport_type_id'],
+                  str(SportStatus.RECORDED))
+
+    return resp.json()
