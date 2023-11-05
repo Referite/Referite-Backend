@@ -35,7 +35,7 @@ def find_date_of_that_sport_type(schedule_data, type_id):
 
 def record_medal_default_restriction(gold, silver, bronze):
     """Record medal from application with default restrictions"""
-    message = {"Warning": "", "Message": "Medal allocation successful."}
+    message = {"Message": "Medal allocation successful."}
     total_medals = gold + silver + bronze
     # Invalid
     if gold >= 3 and silver + bronze > 0:
@@ -61,7 +61,7 @@ def record_medal_repechage_restriction(gold, silver, bronze):
     Record medal from application with repêchage restrictions with bronze medal playoff
     (ref: https://en.wikipedia.org/wiki/List_of_ties_for_medals_at_the_Olympics#Ties_not_included_in_this_list)
     """
-    message = {"Warning": "", "Message": "Medal allocation successful."}
+    message = {"Message": "Medal allocation successful."}
     total_medals = gold + silver + bronze
     # Invalid
     if gold >= 4 and silver + bronze > 0:

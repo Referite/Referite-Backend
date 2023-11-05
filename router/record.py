@@ -34,7 +34,9 @@ def verify_medal(verify_body: VerifyBody):
     """
     Record medal verification if it meets any restrictions and warn accordingly
     return a message dict: warning, message in this order or HTTP400 if invalid
-    message = {"Message": "message", "Monosport": "Appear if have only 1 participant"}
+    message = {"Message": "Successful",
+                "Warning": "Appear if message have warning",
+                "Monosport": "Appear if have message only 1 participant"}
     """
     verify = verify_body.model_dump()
     sport_name, participants = verify['sport_name'], verify['participants']
