@@ -13,7 +13,6 @@ def get_ioc_data(sport_id: int):
     try:
         resp = requests.get(f"https://sota-backend.fly.dev/sport/{sport_id}")
         ioc_data = resp.json()
-        print(ioc_data)
     except Exception as e:
         raise HTTPException(400, f"something went wrong with ioc_data: {e}")
     else:

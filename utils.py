@@ -20,11 +20,12 @@ def calculate_sport_status(sport_types: List[Dict]):
         TROPHY -> any sport_type.status is trophy it will be trophy,
         RECORDED -> all sport_type.status must be recorded then it will be
     """
-    if sport_types is None:
-        return SportStatus.CEREMONIES
     for sport_type in sport_types:
-        if sport_type["status"] == SportStatus.COMPETITIVE:
+        if sport_type["status"] == f"{SportStatus.CEREMONIES}":
+            return SportStatus.CEREMONIES
+        elif sport_type["status"] == f"{SportStatus.COMPETITIVE}":
             return SportStatus.COMPETITIVE
-        if sport_type["status"] == SportStatus.TROPHY:
+        elif sport_type["status"] == f"{SportStatus.TROPHY}":
             return SportStatus.TROPHY
-    return SportStatus.RECORDED
+        else:
+            return None # Change to empty or something
