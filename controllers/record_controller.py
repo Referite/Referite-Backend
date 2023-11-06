@@ -7,6 +7,8 @@ from fastapi import HTTPException
 from db import sport_schedule_connection
 from Enum.sportStatus import SportStatus
 
+from iso3166 import countries
+
 
 def get_ioc_data(sport_id: int):
     """Return sport data if sport ID exists"""
@@ -15,17 +17,18 @@ def get_ioc_data(sport_id: int):
         ioc_data = resp.json()
     except Exception as e:
         raise HTTPException(400, f"something went wrong with ioc_data: {e}")
-    else:
-        for sport_type in ioc_data["sport_types"]:
-            sport_type["participating_country_count"] = len(
-                sport_type["participating_countries"]
-            )
 
     del ioc_data["sport_summary"]
 
     for sport_type in ioc_data["sport_types"]:
         sport_type["participating_country_count"] = len(
             sport_type["participating_countries"]
+        )
+        sport_type["participating_countries"] = list(
+            map(
+                lambda country: countries.get(country).name,
+                sport_type["participating_countries"],
+            )
         )
 
     return ioc_data
@@ -49,20 +52,36 @@ def record_medal_default_restriction(gold, silver, bronze):
     total_medals = gold + silver + bronze
     # Invalid
     if gold >= 3 and silver + bronze > 0:
-        raise HTTPException(400, f"There are {gold} gold medals awarded, No silver or bronze medal will be given.")
+        raise HTTPException(
+            400,
+            f"There are {gold} gold medals awarded, No silver or bronze medal will be given.",
+        )
     elif gold == 2 and silver > 0:
-        raise HTTPException(400, f"There are {gold} gold medals awarded, No silver medal will be given.")
+        raise HTTPException(
+            400, f"There are {gold} gold medals awarded, No silver medal will be given."
+        )
     elif gold == 1 and silver >= 2 and bronze > 0:
-        raise HTTPException(400, f"There are {silver} silver medals awarded, No bronze medal will be given.")
+        raise HTTPException(
+            400,
+            f"There are {silver} silver medals awarded, No bronze medal will be given.",
+        )
     # Warnings
     if total_medals > 3 or total_medals == 0:
-        message["Warning"] = f"There are {total_medals} medals awarded, Do you want to confirm this record?"
+        message[
+            "Warning"
+        ] = f"There are {total_medals} medals awarded, Do you want to confirm this record?"
     elif gold >= 2:
-        message["Warning"] = f"There are {gold} gold medals awarded, Do you want to confirm this record?"
+        message[
+            "Warning"
+        ] = f"There are {gold} gold medals awarded, Do you want to confirm this record?"
     elif silver >= 2:
-        message["Warning"] = f"There are {silver} silver medals awarded, Do you want to confirm this record?"
+        message[
+            "Warning"
+        ] = f"There are {silver} silver medals awarded, Do you want to confirm this record?"
     elif bronze >= 2:
-        message["Warning"] = f"There are {bronze} bronze medals awarded, Do you want to confirm this record?"
+        message[
+            "Warning"
+        ] = f"There are {bronze} bronze medals awarded, Do you want to confirm this record?"
     return message
 
 
@@ -75,20 +94,38 @@ def record_medal_repechage_restriction(gold, silver, bronze):
     total_medals = gold + silver + bronze
     # Invalid
     if gold >= 4 and silver + bronze > 0:
-        raise HTTPException(400, f"There are {gold} gold medals awarded, No silver or bronze medal will be given.")
+        raise HTTPException(
+            400,
+            f"There are {gold} gold medals awarded, No silver or bronze medal will be given.",
+        )
     elif gold == 3 and silver > 0:
-        raise HTTPException(400, f"There are {gold} gold medals awarded, No silver medal will be given.")
-    elif (gold == 2 and silver >= 2 and bronze) > 0 or (gold == 1 and silver >= 3 and bronze > 0):
-        raise HTTPException(400, f"There are {silver} silver medals awarded, No bronze medal will be given.")
+        raise HTTPException(
+            400, f"There are {gold} gold medals awarded, No silver medal will be given."
+        )
+    elif (gold == 2 and silver >= 2 and bronze) > 0 or (
+        gold == 1 and silver >= 3 and bronze > 0
+    ):
+        raise HTTPException(
+            400,
+            f"There are {silver} silver medals awarded, No bronze medal will be given.",
+        )
     # Warnings
     if total_medals > 4 or total_medals == 0:
-        message["Warning"] = f"There are {total_medals} medals awarded, Do you want to confirm this record?"
+        message[
+            "Warning"
+        ] = f"There are {total_medals} medals awarded, Do you want to confirm this record?"
     elif gold >= 2:
-        message["Warning"] = f"There are {gold} gold medals awarded, Do you want to confirm this record?"
+        message[
+            "Warning"
+        ] = f"There are {gold} gold medals awarded, Do you want to confirm this record?"
     elif silver >= 2:
-        message["Warning"] = f"There are {silver} silver medals awarded, Do you want to confirm this record?"
+        message[
+            "Warning"
+        ] = f"There are {silver} silver medals awarded, Do you want to confirm this record?"
     elif bronze >= 3:
-        message["Warning"] = f"There are {bronze} bronze medals awarded, Do you want to confirm this record?"
+        message[
+            "Warning"
+        ] = f"There are {bronze} bronze medals awarded, Do you want to confirm this record?"
     return message
 
 

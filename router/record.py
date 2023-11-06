@@ -10,6 +10,7 @@ from controllers.record_controller import (
 from db import sport_schedule_connection
 from models import IocMedalBody, RecordBody, VerifyBody
 from utils import error_handler
+from iso3166 import countries_by_name
 
 router = APIRouter(
     prefix="/api/record", tags=["record"], responses={404: {"description": "Not found"}}
@@ -39,7 +40,7 @@ def get_detail(sport_id: int):
 
 
 @error_handler
-@router.post('/verify')
+@router.post("/verify")
 def verify_medal(verify_body: VerifyBody):
     """
     Record medal verification if it meets any restrictions and warn accordingly
@@ -49,22 +50,24 @@ def verify_medal(verify_body: VerifyBody):
                 "Monosport": "Appear if have message only 1 participant"}
     """
     verify = verify_body.model_dump()
-    sport_name, participants = verify['sport_name'], verify['participants']
+    sport_name, participants = verify["sport_name"], verify["participants"]
     if not participants:
         raise HTTPException(400, "The participants can not be empty")
     repechage_list = ["wrestling", "boxing", "judo", "taekwondo"]
     gold, silver, bronze = 0, 0, 0
     for country in participants:
-        gold += country['medal']['gold']
-        silver += country['medal']['silver']
-        bronze += country['medal']['bronze']
+        gold += country["medal"]["gold"]
+        silver += country["medal"]["silver"]
+        bronze += country["medal"]["bronze"]
     if sport_name.lower() in repechage_list:
         message = record_medal_repechage_restriction(gold, silver, bronze)
     else:
         message = record_medal_default_restriction(gold, silver, bronze)
     if len(participants) == 1:
-        message["Monosport"] = (f"There are only {len(participants)} country in this medal allocation, "
-                                f"Do you want to confirm this record?")
+        message["Monosport"] = (
+            f"There are only {len(participants)} country in this medal allocation, "
+            f"Do you want to confirm this record?"
+        )
     return message
 
 
@@ -74,4 +77,7 @@ def update(ioc_medal_body: IocMedalBody):
     """
     Update medal allocation in sota database
     """
-    return update_medal_to_ioc(ioc_medal_body.model_dump())
+    data = ioc_medal_body.model_dump()
+    for medal_data in data["participants"]:
+        medal_data["country"] = countries_by_name[medal_data["country"].upper()]
+    return update_medal_to_ioc(data)
