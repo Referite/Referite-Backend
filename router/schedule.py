@@ -1,28 +1,30 @@
 from fastapi import APIRouter
-from db import sport_schedule_connection, sport_connection
-import sys
-from pathlib import Path
+
+from db import sport_connection, sport_schedule_connection
 from models import SportScheduleBody
-from utils import error_handler, calculate_sport_status
+from utils import calculate_sport_status, error_handler
 
+router = APIRouter(
+    prefix="/api/schedule",
+    tags=["schedule"],
+    responses={404: {"description": "Not found"}},
+)
 
-router = APIRouter(prefix='/api/schedule',
-                   tags=["schedule"],
-                   responses={ 404: {"description": "Not found"}})
 
 @error_handler
-@router.post('/add', status_code=201)
+@router.post("/add", status_code=201)
 def add_sport_schedule(sport_schedule: SportScheduleBody):
     """endpoint to add sport schedule into db"""
     sport_schedule_connection.insert_one(sport_schedule.model_dump())
     return {
         "status": "success",
         "message": "Sport schedule added successfully",
-        "data": sport_schedule
+        "data": sport_schedule,
     }
 
+
 @error_handler
-@router.get('/all')
+@router.get("/all")
 def get_schedule():
     """
     get all schedule
@@ -35,12 +37,13 @@ def get_schedule():
 
     return {"schedule_list": current_schedule}
 
+
 @error_handler
-@router.get('/sport')
+@router.get("/sport")
 def get_all_sport():
     """
     get all sport
     """
     all_sport = list(sport_connection.find({}, {"sport_type": 0, "_id": 0}))
-    
+
     return {"sport_list": all_sport}
