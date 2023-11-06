@@ -26,10 +26,6 @@ def get_detail(sport_id: int):
             filter={"sport.sport_id": sport_id},
             projection={
                 "_id": 0,
-                "sport.sport_type._id": 0,
-                "sport.revision_id": 0,
-                "sport.sport_type.revision_id": 0,
-                "sport._id": 0,
             },
         )
     )
