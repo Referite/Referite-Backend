@@ -54,16 +54,19 @@ def record_medal_default_restriction(gold, silver, bronze):
     if gold >= 3 and silver + bronze > 0:
         raise HTTPException(
             400,
-            f"There are {gold} gold medals awarded, No silver or bronze medal will be given.",
+            f"""There are {
+                            gold} gold medals awarded, No silver or bronze medal will be given.""",
         )
     elif gold == 2 and silver > 0:
         raise HTTPException(
-            400, f"There are {gold} gold medals awarded, No silver medal will be given."
+            400,
+            f"""There are {gold} gold medals awarded, No silver medal will be given.""",
         )
     elif gold == 1 and silver >= 2 and bronze > 0:
         raise HTTPException(
             400,
-            f"There are {silver} silver medals awarded, No bronze medal will be given.",
+            f"""There are {
+                            silver} silver medals awarded, No bronze medal will be given.""",
         )
     # Warnings
     if total_medals > 3 or total_medals == 0:
@@ -96,18 +99,22 @@ def record_medal_repechage_restriction(gold, silver, bronze):
     if gold >= 4 and silver + bronze > 0:
         raise HTTPException(
             400,
-            f"There are {gold} gold medals awarded, No silver or bronze medal will be given.",
+            f"""There are {
+                gold} gold medals awarded, No silver or bronze medal will be given.""",
         )
     elif gold == 3 and silver > 0:
         raise HTTPException(
-            400, f"There are {gold} gold medals awarded, No silver medal will be given."
+            400,
+            f"""There are {
+                gold} gold medals awarded, No silver medal will be given.""",
         )
     elif (gold == 2 and silver >= 2 and bronze) > 0 or (
         gold == 1 and silver >= 3 and bronze > 0
     ):
         raise HTTPException(
             400,
-            f"There are {silver} silver medals awarded, No bronze medal will be given.",
+            f"""There are {
+                silver} silver medals awarded, No bronze medal will be given.""",
         )
     # Warnings
     if total_medals > 4 or total_medals == 0:
@@ -162,6 +169,7 @@ def update_medal_to_ioc(medal: Dict):
 
     return resp.json()
 
+
 def load_medal_from_ioc(sport_id: int):
     """Load medal from IOC for showing in load detail page."""
     try:
@@ -177,19 +185,30 @@ def load_medal_from_ioc(sport_id: int):
         )
     )
     for types in ioc_data["sport_types"]:
-        resp = requests.get(f"https://sota-backend.fly.dev/medal/s/{sport_id}/t/{types['type_id']}").json()
+        resp = requests.get(
+            f"https://sota-backend.fly.dev/medal/s/{sport_id}/t/{types['type_id']}"
+        ).json()
         if resp == {}:
             raise HTTPException(400, "Please, record medal before load detail")
         types["competition_date"] = find_date_of_that_sport_type(
             current_schedule, types["type_id"]
         )
-        for type in resp["invidual_countries"]:
-            type["medal"] = {"gold": type["gold"], "silver": type["silver"], "bronze": type["bronze"]}
-            del type["gold"]
-            del type["silver"]
-            del type["bronze"]
 
-        types["participants"] = resp["invidual_countries"] #TODO Change to individual_countries when IOC fix their endpoint
+        for each_type in resp["invidual_countries"]:
+            each_type["country"] = each_type["country_name"]
+            each_type["medal"] = {
+                "gold": each_type["gold"],
+                "silver": each_type["silver"],
+                "bronze": each_type["bronze"],
+            }
+            del each_type["gold"]
+            del each_type["silver"]
+            del each_type["bronze"]
+            del each_type["country_name"]
+            del each_type["country_code"]
+
+        # TODO Change to individual_countries when IOC fix their endpoint
+        types["participants"] = resp["invidual_countries"]
         del types["participating_countries"]
     del ioc_data["participating_countries"]
 

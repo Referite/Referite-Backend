@@ -83,17 +83,14 @@ class IocMedalBody(BaseModel):
     sport_type_id: int
     participants: List[ParticipantBody]
 
-class ParticipantsBody(BaseModel):
-    country_code: str
-    country_name: str
-    medal: MedalBody
 
 class LoadMedalSportTypeBody(BaseModel):
     type_id: int
     type_name: str
     participating_country_count: int
     competition_date: datetime.date
-    participants: List[ParticipantsBody]
+    participants: List[ParticipantBody]
+
 
 class LoadMedalBody(BaseModel):
     sport_id: int
