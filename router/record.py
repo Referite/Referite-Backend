@@ -6,6 +6,7 @@ from controllers.record_controller import (
     record_medal_default_restriction,
     record_medal_repechage_restriction,
     update_medal_to_ioc,
+    load_medal_from_ioc
 )
 from db import sport_schedule_connection
 from models import IocMedalBody, RecordBody, VerifyBody
@@ -82,3 +83,11 @@ def update(ioc_medal_body: IocMedalBody):
     Update medal allocation in sota database
     """
     return update_medal_to_ioc(ioc_medal_body.model_dump())
+
+@error_handler
+@router.get("/medal/load/{sport_id}")
+def load(sport_id: int):
+    """
+    Load medal allocation in sota database
+    """
+    return load_medal_from_ioc(sport_id)

@@ -110,3 +110,27 @@ def update_medal_to_ioc(medal: Dict):
     update_status(data["sport_id"], data["sport_type_id"], str(SportStatus.RECORDED))
 
     return resp.json()
+
+def load_medal_from_ioc(sport_id: int):
+    try:
+        ioc_data = get_ioc_data(sport_id)
+    except Exception as e:
+        raise HTTPException(400, f"something went wrong with ioc_data: {e}")
+    current_schedule = list(
+        sport_schedule_connection.find(
+            filter={"sport.sport_id": sport_id},
+            projection={
+                "_id": 0,
+            },
+        )
+    )
+    for types in ioc_data["sport_types"]:
+        resp = requests.get(f"https://sota-backend.fly.dev/medal/s/{sport_id}/t/{types['type_id']}").json()
+        types["competition_date"] = find_date_of_that_sport_type(
+            current_schedule, types["type_id"]
+        )
+        types["participants"] = resp["invidual_countries"] #TODO Change to individual_countries when IOC fix their end point
+        del types["participating_countries"]
+    del ioc_data["participating_countries"]
+
+    return ioc_data
