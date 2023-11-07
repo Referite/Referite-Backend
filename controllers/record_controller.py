@@ -144,6 +144,7 @@ def update_status(sport_id: int, sport_type_id: int, status: SportStatus):
 
 
 def update_medal_to_ioc(medal: Dict):
+    """Update medal to IOC with Authorization token"""
     headers = {
         "Content-Type": "application/json",
         "Authorization": f'Bearer {config("IOC_ACCESS_TOKEN", cast=str, default="")}',
@@ -162,6 +163,7 @@ def update_medal_to_ioc(medal: Dict):
     return resp.json()
 
 def load_medal_from_ioc(sport_id: int):
+    """Load medal from IOC for showing in load detail page."""
     try:
         ioc_data = get_ioc_data(sport_id)
     except Exception as e:
