@@ -181,7 +181,13 @@ def load_medal_from_ioc(sport_id: int):
         types["competition_date"] = find_date_of_that_sport_type(
             current_schedule, types["type_id"]
         )
-        types["participants"] = resp["invidual_countries"] #TODO Change to individual_countries when IOC fix their end point
+        for type in resp["invidual_countries"]:
+            type["medal"] = {"gold": type["gold"], "silver": type["silver"], "bronze": type["bronze"]}
+            del type["gold"]
+            del type["silver"]
+            del type["bronze"]
+
+        types["participants"] = resp["invidual_countries"] #TODO Change to individual_countries when IOC fix their endpoint
         del types["participating_countries"]
     del ioc_data["participating_countries"]
 
