@@ -11,6 +11,7 @@ from controllers.record_controller import (
 from db import sport_schedule_connection
 from models import IocMedalBody, RecordBody, VerifyBody
 from utils import error_handler
+from iso3166 import countries_by_name
 
 router = APIRouter(
     prefix="/api/record", tags=["record"], responses={404: {"description": "Not found"}}
@@ -82,7 +83,10 @@ def update(ioc_medal_body: IocMedalBody):
     """
     Update medal allocation in sota database
     """
-    return update_medal_to_ioc(ioc_medal_body.model_dump())
+    data = ioc_medal_body.model_dump()
+    for medal_data in data["participants"]:
+        medal_data["country"] = countries_by_name[medal_data["country"].upper()].alpha2
+    return update_medal_to_ioc(data)
 
 @error_handler
 @router.get("/medal/load/{sport_id}")
