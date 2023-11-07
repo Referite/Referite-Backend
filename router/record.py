@@ -79,5 +79,5 @@ def update(ioc_medal_body: IocMedalBody):
     """
     data = ioc_medal_body.model_dump()
     for medal_data in data["participants"]:
-        medal_data["country"] = countries_by_name[medal_data["country"].upper()]
+        medal_data["country"] = countries_by_name[medal_data["country"].upper()].alpha2
     return update_medal_to_ioc(data)
