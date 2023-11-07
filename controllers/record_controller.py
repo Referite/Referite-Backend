@@ -178,6 +178,8 @@ def load_medal_from_ioc(sport_id: int):
     )
     for types in ioc_data["sport_types"]:
         resp = requests.get(f"https://sota-backend.fly.dev/medal/s/{sport_id}/t/{types['type_id']}").json()
+        if resp == {}:
+            raise HTTPException(400, "Please, record medal before load detail")
         types["competition_date"] = find_date_of_that_sport_type(
             current_schedule, types["type_id"]
         )
