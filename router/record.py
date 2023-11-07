@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from controllers.record_controller import (
     find_date_of_that_sport_type,
@@ -45,35 +45,30 @@ def get_detail(sport_id: int):
 def verify_medal(verify_body: VerifyBody):
     """
     Record medal verification if it meets any restrictions and warn accordingly
-    return twos dict: warning, message in this order
-    warning = {"Warning": "message"} or warning = {} depends on if it needs to warn or not
-    message = {"Message": "message"}
+    return a message dict: warning, message in this order or HTTP400 if invalid
+    message = {"Message": "Successful",
+                "Warning": "Appear if message have warning",
+                "Monosport": "Appear if have message only 1 participant"}
     """
     verify = verify_body.model_dump()
-    sport_name, participant = verify["sport_name"], verify["participants"]
+    sport_name, participants = verify["sport_name"], verify["participants"]
+    if not participants:
+        raise HTTPException(400, "The participants can not be empty")
     repechage_list = ["wrestling", "boxing", "judo", "taekwondo"]
-    warning_countries = []
-    message = {"Warning": "", "Message": "Medal allocation successful."}
-    for country in participant:
-        country_name = country["country"]
-        gold = country["medal"]["gold"]
-        silver = country["medal"]["silver"]
-        bronze = country["medal"]["bronze"]
-        if sport_name.lower() in repechage_list:
-            warning_country = record_medal_repechage_restriction(
-                country_name, gold, silver, bronze
-            )
-            warning_countries.append(warning_country)
-        else:
-            warning_country = record_medal_default_restriction(
-                country_name, gold, silver, bronze
-            )
-            if warning_country != "":
-                warning_countries.append(warning_country)
-    if warning_countries:
-        message[
-            "Warning"
-        ] = f"Medal allocation for {warning_countries} deviates from default logic."
+    gold, silver, bronze = 0, 0, 0
+    for country in participants:
+        gold += country["medal"]["gold"]
+        silver += country["medal"]["silver"]
+        bronze += country["medal"]["bronze"]
+    if sport_name.lower() in repechage_list:
+        message = record_medal_repechage_restriction(gold, silver, bronze)
+    else:
+        message = record_medal_default_restriction(gold, silver, bronze)
+    if len(participants) == 1:
+        message["Monosport"] = (
+            f"There are only {len(participants)} country in this medal allocation, "
+            f"Do you want to confirm this record?"
+        )
     return message
 
 
