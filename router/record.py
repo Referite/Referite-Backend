@@ -7,6 +7,7 @@ from controllers.record_controller import (
     record_medal_repechage_restriction,
     update_medal_to_ioc,
     load_medal_from_ioc,
+    find_status_of_that_sport_type
 )
 from db import sport_schedule_connection
 from models import IocMedalBody, LoadMedalBody, RecordBody, VerifyBody
