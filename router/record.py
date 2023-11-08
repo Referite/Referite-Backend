@@ -53,6 +53,7 @@ def get_detail(sport_id: int):
     return resp
 
 
+
 @error_handler
 @router.post("/verify")
 def verify_medal(verify_body: VerifyBody):
@@ -103,4 +104,5 @@ def load(sport_id: int):
     """
     Load medal allocation in sota database
     """
+
     return load_medal_from_ioc(sport_id)
