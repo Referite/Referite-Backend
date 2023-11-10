@@ -6,7 +6,7 @@ import jwt
 from decouple import config
 from fastapi import HTTPException, Request
 
-from db import referee_id_connection
+from db import referee_id_connection, audience_connection
 from models import RefereeIdBody
 
 JWT_SECRET = config("JWT_SECRET")
@@ -53,13 +53,15 @@ def hash_password(id_body: RefereeIdBody):
 def check_token(request: Request):
     try:
         req = request.headers["authorization"]
+        if audience_connection.find_one({"audience_token": req}):
+            return {"message": "Authorize"}
         payload = get_decodeJWT(req)
         user = referee_id_connection.find_one(
             {"username": payload.get("user_id")}, {"_id": 0}
         )
     except Exception:
         raise HTTPException(401, "Please, Login")
-    return user
+    return {"message": "Authorize"}
 
 def logout_handler(request: Request):
     try:
