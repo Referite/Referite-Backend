@@ -13,7 +13,7 @@ router = APIRouter(
 
 
 @error_handler
-@router.post("/add", status_code=201)
+@router.post("/add", status_code=201, dependencies=[Depends(check_token)])
 def add_sport_schedule(sport_schedule: SportScheduleBody):
     """endpoint to add sport schedule into db"""
     sport_schedule_connection.insert_one(sport_schedule.model_dump())
@@ -25,7 +25,7 @@ def add_sport_schedule(sport_schedule: SportScheduleBody):
 
 
 @error_handler
-@router.get("/all")
+@router.get("/all", dependencies=[Depends(check_token)])
 def get_schedule():
     """
     get all schedule
