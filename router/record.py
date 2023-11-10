@@ -6,7 +6,7 @@ from controllers.record_controller import (
     record_medal_default_restriction,
     record_medal_repechage_restriction,
     update_medal_to_ioc,
-    load_medal_from_ioc
+    load_medal_from_ioc,
 )
 from db import sport_schedule_connection
 from models import IocMedalBody, LoadMedalBody, RecordBody, VerifyBody
@@ -19,7 +19,7 @@ router = APIRouter(
 
 
 @error_handler
-@router.get("/detail/{sport_id}", response_model=RecordBody)
+@router.get("/detail/{sport_id}")  # , response_model=RecordBody)
 def get_detail(sport_id: int):
     """Retrieve sport detail by sport ID and match it with schedule data."""
     resp = get_ioc_data(sport_id)
@@ -32,10 +32,22 @@ def get_detail(sport_id: int):
         )
     )
 
-    for types in resp["sport_types"]:
-        types["competition_date"] = find_date_of_that_sport_type(
-            current_schedule, types["type_id"]
-        )
+    remove_idx = []
+
+    for idx, types in enumerate(resp["sport_types"]):
+        try:
+            types["competition_date"] = find_date_of_that_sport_type(
+                current_schedule, types["type_id"], sport_id
+            )
+        except:
+            remove_idx.append(idx)
+
+    temp = []
+    for idx, types in enumerate(resp["sport_types"]):
+        if idx not in remove_idx:
+            temp.append(types)
+
+    resp["sport_types"] = temp
 
     return resp
 
@@ -82,6 +94,7 @@ def update(ioc_medal_body: IocMedalBody):
     for medal_data in data["participants"]:
         medal_data["country"] = countries_by_name[medal_data["country"].upper()].alpha2
     return update_medal_to_ioc(data)
+
 
 @error_handler
 @router.get("/medal/load/{sport_id}", response_model=LoadMedalBody)

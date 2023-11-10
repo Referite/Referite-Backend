@@ -34,16 +34,19 @@ def get_ioc_data(sport_id: int):
     return ioc_data
 
 
-def find_date_of_that_sport_type(schedule_data, type_id):
+def find_date_of_that_sport_type(schedule_data, type_id, sport_id):
     """
     Find date of that sport type in schedule data
     """
     for schedule in schedule_data:
         for sport in schedule["sport"]:
+            if sport["sport_id"] != sport_id:
+                continue
+
             for sport_type in sport["sport_type"]:
                 if sport_type["type_id"] == type_id:
                     return schedule["datetime"]
-    raise Exception("No sport that matches you request type_id")
+    raise HTTPException(400)
 
 
 def record_medal_default_restriction(gold, silver, bronze):
@@ -194,7 +197,7 @@ def load_medal_from_ioc(sport_id: int):
             current_schedule, types["type_id"]
         )
 
-        for each_type in resp["invidual_countries"]:
+        for each_type in resp["individual_countries"]:
             each_type["country"] = each_type["country_name"]
             each_type["medal"] = {
                 "gold": each_type["gold"],
@@ -207,8 +210,7 @@ def load_medal_from_ioc(sport_id: int):
             del each_type["country_name"]
             del each_type["country_code"]
 
-        # TODO Change to individual_countries when IOC fix their endpoint
-        types["participants"] = resp["invidual_countries"]
+        types["participants"] = resp["individual_countries"]
         del types["participating_countries"]
     del ioc_data["participating_countries"]
 
