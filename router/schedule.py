@@ -1,4 +1,5 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from auth.auth_handler import check_token
 
 from db import sport_connection, sport_schedule_connection
 from models import SportScheduleBody
@@ -39,7 +40,7 @@ def get_schedule():
 
 
 @error_handler
-@router.get("/sport")
+@router.get("/sport", dependencies=[Depends(check_token)])
 def get_all_sport():
     """
     get all sport
