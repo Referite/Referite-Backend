@@ -52,7 +52,7 @@ def hash_password(id_body: RefereeIdBody):
 
 def check_token(request: Request):
     try:
-        req = request.cookies["access_token"]
+        req = request.headers["authorization"]
         payload = get_decodeJWT(req)
         user = referee_id_connection.find_one(
             {"username": payload.get("user_id")}, {"_id": 0}
@@ -63,7 +63,7 @@ def check_token(request: Request):
 
 def logout_handler(request: Request):
     try:
-        req = request.cookies["access_token"]
+        req = request.cookies["authorization"]
         payload = get_decodeJWT(req)
         referee_id_connection.update_one({"username": payload.get("user_id")}, {"$set": {"expired": None}})
     except:
