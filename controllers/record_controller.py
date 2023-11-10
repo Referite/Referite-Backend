@@ -208,9 +208,13 @@ def load_medal_from_ioc(sport_id: int):
         ).json()
         if resp == {}:
             raise HTTPException(400, "Please, record medal before load detail")
-        types["competition_date"] = find_date_of_that_sport_type(
-            current_schedule, types["type_id"], sport_id
-        )
+        try:
+            types["competition_date"] = find_date_of_that_sport_type(
+                current_schedule, types["type_id"], sport_id
+            )
+            types["status"] = find_status_of_that_sport_type(current_schedule, types["type_id"], sport_id)
+        except:
+            raise HTTPException(400, "BLALALBALBLAL")
 
         for each_type in resp["individual_countries"]:
             each_type["country"] = each_type["country_name"]
