@@ -42,10 +42,11 @@ def find_date_of_that_sport_type(schedule_data, type_id, sport_id):
         for sport in schedule["sport"]:
             if sport["sport_id"] != sport_id:
                 continue
+
             for sport_type in sport["sport_type"]:
                 if sport_type["type_id"] == type_id:
                     return schedule["datetime"]
-    raise Exception("No sport that matches you request type_id")
+    raise HTTPException(400)
 
 
 def record_medal_default_restriction(gold, silver, bronze):
