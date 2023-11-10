@@ -1,3 +1,5 @@
+import datetime
+
 from fastapi import APIRouter, HTTPException
 
 from controllers.record_controller import (
@@ -10,9 +12,10 @@ from controllers.record_controller import (
     find_status_of_that_sport_type
 )
 from db import sport_schedule_connection
-from models import IocMedalBody, LoadMedalBody, RecordBody, VerifyBody
+from models import IocMedalBody, LoadMedalBody, RecordBody, VerifyBody, LoadMedalSportTypeBody, ParticipantBody
 from utils import error_handler
 from iso3166 import countries_by_name
+from Enum.sportStatus import SportStatus
 
 router = APIRouter(
     prefix="/api/record", tags=["record"], responses={404: {"description": "Not found"}}
@@ -21,7 +24,7 @@ router = APIRouter(
 
 @error_handler
 @router.get("/detail/{sport_id}")  # , response_model=RecordBody)
-def get_detail(sport_id: int):
+def get_detail(sport_id: int) -> RecordBody | LoadMedalBody:
     """Retrieve sport detail by sport ID and match it with schedule data."""
     resp = get_ioc_data(sport_id)
     current_schedule = list(
@@ -38,6 +41,9 @@ def get_detail(sport_id: int):
     for idx, types in enumerate(resp["sport_types"]):
         try:
             types["competition_date"] = find_date_of_that_sport_type(
+                current_schedule, types["type_id"], sport_id   
+            )
+            types["status"] = find_status_of_that_sport_type(
                 current_schedule, types["type_id"], sport_id
             )
         except:
@@ -50,8 +56,13 @@ def get_detail(sport_id: int):
 
     resp["sport_types"] = temp
 
-    return resp
+    for types in resp["sport_types"]:
+        if types["status"] == SportStatus.RECORDED:
+            return LoadMedalBody(**load_medal_from_ioc(sport_id))
+        else:
+            return RecordBody(**resp)
 
+    return resp
 
 
 @error_handler

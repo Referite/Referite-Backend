@@ -209,7 +209,7 @@ def load_medal_from_ioc(sport_id: int):
         if resp == {}:
             raise HTTPException(400, "Please, record medal before load detail")
         types["competition_date"] = find_date_of_that_sport_type(
-            current_schedule, types["type_id"]
+            current_schedule, types["type_id"], sport_id
         )
 
         for each_type in resp["individual_countries"]:
