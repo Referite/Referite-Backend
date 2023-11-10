@@ -96,3 +96,8 @@ class LoadMedalBody(BaseModel):
     sport_id: int
     sport_name: str
     sport_types: List[LoadMedalSportTypeBody]
+
+class TokenBody(BaseModel):
+    access_token: str
+    expired: str
+
