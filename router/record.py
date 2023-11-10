@@ -34,7 +34,7 @@ def get_detail(sport_id: int):
 
     for types in resp["sport_types"]:
         types["competition_date"] = find_date_of_that_sport_type(
-            current_schedule, types["type_id"]
+            current_schedule, types["type_id"], sport_id
         )
 
     return resp
