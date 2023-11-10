@@ -6,7 +6,7 @@ from controllers.record_controller import (
     record_medal_default_restriction,
     record_medal_repechage_restriction,
     update_medal_to_ioc,
-    load_medal_from_ioc
+    load_medal_from_ioc,
 )
 from db import sport_schedule_connection
 from models import IocMedalBody, LoadMedalBody, RecordBody, VerifyBody
@@ -82,6 +82,7 @@ def update(ioc_medal_body: IocMedalBody):
     for medal_data in data["participants"]:
         medal_data["country"] = countries_by_name[medal_data["country"].upper()].alpha2
     return update_medal_to_ioc(data)
+
 
 @error_handler
 @router.get("/medal/load/{sport_id}", response_model=LoadMedalBody)

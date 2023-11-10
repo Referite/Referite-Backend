@@ -194,7 +194,7 @@ def load_medal_from_ioc(sport_id: int):
             current_schedule, types["type_id"]
         )
 
-        for each_type in resp["invidual_countries"]:
+        for each_type in resp["individual_countries"]:
             each_type["country"] = each_type["country_name"]
             each_type["medal"] = {
                 "gold": each_type["gold"],
@@ -207,8 +207,7 @@ def load_medal_from_ioc(sport_id: int):
             del each_type["country_name"]
             del each_type["country_code"]
 
-        # TODO Change to individual_countries when IOC fix their endpoint
-        types["participants"] = resp["invidual_countries"]
+        types["participants"] = resp["individual_countries"]
         del types["participating_countries"]
     del ioc_data["participating_countries"]
 
