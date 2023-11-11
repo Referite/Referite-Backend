@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from auth.auth_handler import check_token
+from auth.auth_handler import check_token, allow_permission
 
 from db import sport_connection, sport_schedule_connection
 from models import SportScheduleBody
@@ -9,12 +9,11 @@ router = APIRouter(
     prefix="/api/schedule",
     tags=["schedule"],
     responses={404: {"description": "Not found"}},
-    dependencies=[Depends(check_token)],
 )
 
 
 @error_handler
-@router.post("/add", status_code=201)
+@router.post("/add", status_code=201, dependencies=[Depends(check_token)])
 def add_sport_schedule(sport_schedule: SportScheduleBody):
     """endpoint to add sport schedule into db"""
     sport_schedule_connection.insert_one(sport_schedule.model_dump())
@@ -26,7 +25,7 @@ def add_sport_schedule(sport_schedule: SportScheduleBody):
 
 
 @error_handler
-@router.get("/all")
+@router.get("/all", dependencies=[Depends(allow_permission)])
 def get_schedule():
     """
     get all schedule
@@ -41,7 +40,7 @@ def get_schedule():
 
 
 @error_handler
-@router.get("/sport")
+@router.get("/sport", dependencies=[Depends(allow_permission)])
 def get_all_sport():
     """
     get all sport
