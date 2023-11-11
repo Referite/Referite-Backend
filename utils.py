@@ -1,7 +1,7 @@
 from typing import Dict, List
 
 from Enum.sportStatus import SportStatus
-
+import iso3166_2 as iso
 
 def error_handler(f):
     def wrapper(*arg, **kwargs):
@@ -32,3 +32,6 @@ def calculate_sport_status(sport_types: List[Dict]):
         if sport_type["status"] == f"{SportStatus.TROPHY}":
             return SportStatus.TROPHY
     return SportStatus.RECORDED
+
+def get_country_name(country_code: str):
+    return iso.country[country_code].name['official']
