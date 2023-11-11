@@ -38,21 +38,45 @@ def record_medal_default_restriction(gold, silver, bronze):
     message = {"Message": "Medal allocation successful."}
     total_medals = gold + silver + bronze
     # Invalid
-    if gold >= 3 and silver + bronze > 0:
-        raise HTTPException(400, f"There are {gold} gold medals awarded, No silver or bronze medal will be given.")
+    if total_medals == 0:
+        raise HTTPException(
+            400,
+            f"""There are {total_medals} medals awarded, no need to record this body.""",
+        )
+    elif gold >= 3 and silver + bronze > 0:
+        raise HTTPException(
+            400,
+            f"""There are {
+                            gold} gold medals awarded, No silver or bronze medal will be given.""",
+        )
     elif gold == 2 and silver > 0:
-        raise HTTPException(400, f"There are {gold} gold medals awarded, No silver medal will be given.")
+        raise HTTPException(
+            400,
+            f"""There are {gold} gold medals awarded, No silver medal will be given.""",
+        )
     elif gold == 1 and silver >= 2 and bronze > 0:
-        raise HTTPException(400, f"There are {silver} silver medals awarded, No bronze medal will be given.")
+        raise HTTPException(
+            400,
+            f"""There are {
+                            silver} silver medals awarded, No bronze medal will be given.""",
+        )
     # Warnings
-    if total_medals > 3 or total_medals == 0:
-        message["Warning"] = f"There are {total_medals} medals awarded, Do you want to confirm this record?"
+    if total_medals > 3:
+        message[
+            "Warning"
+        ] = f"There are {total_medals} medals awarded, Do you want to confirm this record?"
     elif gold >= 2:
-        message["Warning"] = f"There are {gold} gold medals awarded, Do you want to confirm this record?"
+        message[
+            "Warning"
+        ] = f"There are {gold} gold medals awarded, Do you want to confirm this record?"
     elif silver >= 2:
-        message["Warning"] = f"There are {silver} silver medals awarded, Do you want to confirm this record?"
+        message[
+            "Warning"
+        ] = f"There are {silver} silver medals awarded, Do you want to confirm this record?"
     elif bronze >= 2:
-        message["Warning"] = f"There are {bronze} bronze medals awarded, Do you want to confirm this record?"
+        message[
+            "Warning"
+        ] = f"There are {bronze} bronze medals awarded, Do you want to confirm this record?"
     return message
 
 
@@ -64,20 +88,47 @@ def record_medal_repechage_restriction(gold, silver, bronze):
     message = {"Message": "Medal allocation successful."}
     total_medals = gold + silver + bronze
     # Invalid
-    if gold >= 4 and silver + bronze > 0:
-        raise HTTPException(400, f"There are {gold} gold medals awarded, No silver or bronze medal will be given.")
+    if total_medals == 0:
+        raise HTTPException(
+            400,
+            f"""There are {total_medals} medals awarded, no need to record this body.""",
+        )
+    elif gold >= 4 and silver + bronze > 0:
+        raise HTTPException(
+            400,
+            f"""There are {
+                gold} gold medals awarded, No silver or bronze medal will be given.""",
+        )
     elif gold == 3 and silver > 0:
-        raise HTTPException(400, f"There are {gold} gold medals awarded, No silver medal will be given.")
-    elif (gold == 2 and silver >= 2 and bronze) > 0 or (gold == 1 and silver >= 3 and bronze > 0):
-        raise HTTPException(400, f"There are {silver} silver medals awarded, No bronze medal will be given.")
+        raise HTTPException(
+            400,
+            f"""There are {
+                gold} gold medals awarded, No silver medal will be given.""",
+        )
+    elif (gold == 2 and silver >= 2 and bronze) > 0 or (
+        gold == 1 and silver >= 3 and bronze > 0
+    ):
+        raise HTTPException(
+            400,
+            f"""There are {
+                silver} silver medals awarded, No bronze medal will be given.""",
+        )
     # Warnings
-    if total_medals > 4 or total_medals == 0:
-        message["Warning"] = f"There are {total_medals} medals awarded, Do you want to confirm this record?"
+    if total_medals > 4:
+        message[
+            "Warning"
+        ] = f"There are {total_medals} medals awarded, Do you want to confirm this record?"
     elif gold >= 2:
-        message["Warning"] = f"There are {gold} gold medals awarded, Do you want to confirm this record?"
+        message[
+            "Warning"
+        ] = f"There are {gold} gold medals awarded, Do you want to confirm this record?"
     elif silver >= 2:
-        message["Warning"] = f"There are {silver} silver medals awarded, Do you want to confirm this record?"
+        message[
+            "Warning"
+        ] = f"There are {silver} silver medals awarded, Do you want to confirm this record?"
     elif bronze >= 3:
-        message["Warning"] = f"There are {bronze} bronze medals awarded, Do you want to confirm this record?"
+        message[
+            "Warning"
+        ] = f"There are {bronze} bronze medals awarded, Do you want to confirm this record?"
     return message
 
