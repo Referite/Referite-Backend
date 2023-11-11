@@ -39,7 +39,7 @@ def get_detail(sport_id: int, date: datetime.datetime):
 
     remove_idx = []
 
-    formatted_competition_date = date.strftime("%Y-%m-%dT%H:%M:%S")
+    formatted_competition_date = date.isoformat()
 
     for idx, types in enumerate(resp["sport_types"]):
         try:
