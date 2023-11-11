@@ -54,7 +54,12 @@ def record_medal_default_restriction(gold, silver, bronze):
     message = {"Message": "Medal allocation successful."}
     total_medals = gold + silver + bronze
     # Invalid
-    if gold >= 3 and silver + bronze > 0:
+    if total_medals == 0:
+        raise HTTPException(
+            400,
+            f"""There are {total_medals} medals awarded, no need to record this body.""",
+        )
+    elif gold >= 3 and silver + bronze > 0:
         raise HTTPException(
             400,
             f"""There are {
@@ -72,7 +77,7 @@ def record_medal_default_restriction(gold, silver, bronze):
                             silver} silver medals awarded, No bronze medal will be given.""",
         )
     # Warnings
-    if total_medals > 3 or total_medals == 0:
+    if total_medals > 3:
         message[
             "Warning"
         ] = f"There are {total_medals} medals awarded, Do you want to confirm this record?"
@@ -99,7 +104,12 @@ def record_medal_repechage_restriction(gold, silver, bronze):
     message = {"Message": "Medal allocation successful."}
     total_medals = gold + silver + bronze
     # Invalid
-    if gold >= 4 and silver + bronze > 0:
+    if total_medals == 0:
+        raise HTTPException(
+            400,
+            f"""There are {total_medals} medals awarded, no need to record this body.""",
+        )
+    elif gold >= 4 and silver + bronze > 0:
         raise HTTPException(
             400,
             f"""There are {
@@ -120,7 +130,7 @@ def record_medal_repechage_restriction(gold, silver, bronze):
                 silver} silver medals awarded, No bronze medal will be given.""",
         )
     # Warnings
-    if total_medals > 4 or total_medals == 0:
+    if total_medals > 4:
         message[
             "Warning"
         ] = f"There are {total_medals} medals awarded, Do you want to confirm this record?"
