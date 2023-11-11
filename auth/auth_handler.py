@@ -51,17 +51,31 @@ def hash_password(id_body: RefereeIdBody):
 
 
 def check_token(request: Request):
+    """Only user can access"""
     try:
         req = request.headers["authorization"]
         if audience_connection.find_one({"audience_token": req}):
-            return {"message": "Authorize"}
+            raise HTTPException(403, "Audience not allowed")
         payload = get_decodeJWT(req)
         user = referee_id_connection.find_one(
             {"username": payload.get("user_id")}, {"_id": 0}
         )
     except Exception:
         raise HTTPException(401, "Please, Login")
-    return {"message": "Authorize"}
+    if user is not None:
+        return {"message": "Authorize"}
+    
+def allow_permission(request: Request):
+    """Allow both audience and referee to access"""
+    try:
+        req = request.headers["authorization"]
+        if audience_connection.find_one({"audience_token": req}):
+            return {"message": "Authorize Audience"}
+        payload = get_decodeJWT(req)
+        if referee_id_connection.find_one({"username": payload.get("user_id")}, {"_id": 0}):
+            return {"message": "Authorize Referee"}
+    except Exception:
+        raise HTTPException(401, "Please, Login")
 
 def logout_handler(request: Request):
     try:
