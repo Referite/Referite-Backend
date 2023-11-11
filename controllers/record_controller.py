@@ -59,9 +59,8 @@ def find_status_of_that_sport_type(schedule_data, type_id, sport_id):
                 continue
             for sport_type in sport["sport_type"]:
                 if sport_type["type_id"] == type_id:
-                    print(sport_type)
                     return sport_type["status"]
-    raise Exception("No sport that matches you request type_id")
+    raise HTTPException(400)
 
 
 def record_medal_default_restriction(gold, silver, bronze):
@@ -188,49 +187,26 @@ def update_medal_to_ioc(medal: Dict):
     return resp.json()
 
 
-def load_medal_from_ioc(sport_id: int):
+def load_medal(sport_id: int, type_id):
     """Load medal from IOC for showing in load detail page."""
-    try:
-        ioc_data = get_ioc_data(sport_id)
-    except Exception as e:
-        raise HTTPException(400, f"something went wrong with ioc_data: {e}")
-    current_schedule = list(
-        sport_schedule_connection.find(
-            filter={"sport.sport_id": sport_id},
-            projection={
-                "_id": 0,
-            },
-        )
-    )
-    for types in ioc_data["sport_types"]:
-        resp = requests.get(
-            f"https://sota-backend.fly.dev/medal/s/{sport_id}/t/{types['type_id']}"
-        ).json()
-        if resp == {}:
-            raise HTTPException(400, "Please, record medal before load detail")
-        try:
-            types["competition_date"] = find_date_of_that_sport_type(
-                current_schedule, types["type_id"], sport_id
-            )
-            types["status"] = find_status_of_that_sport_type(current_schedule, types["type_id"], sport_id)
-        except:
-            raise HTTPException(400, "BLALALBALBLAL")
+    print(type_id)
+    resp = requests.get(
+        f"https://sota-backend.fly.dev/medal/s/{sport_id}/t/{type_id}"
+    ).json()
+    if resp == {}:
+        raise HTTPException(400, "Please, record medal before load detail")
 
-        for each_type in resp["individual_countries"]:
-            each_type["country"] = each_type["country_name"]
-            each_type["medal"] = {
-                "gold": each_type["gold"],
-                "silver": each_type["silver"],
-                "bronze": each_type["bronze"],
-            }
-            del each_type["gold"]
-            del each_type["silver"]
-            del each_type["bronze"]
-            del each_type["country_name"]
-            del each_type["country_code"]
+    for each_type in resp["individual_countries"]:
+        each_type["country"] = each_type["country_name"]
+        each_type["medal"] = {
+            "gold": each_type["gold"],
+            "silver": each_type["silver"],
+            "bronze": each_type["bronze"],
+        }
+        del each_type["gold"]
+        del each_type["silver"]
+        del each_type["bronze"]
+        del each_type["country_name"]
+        del each_type["country_code"]
 
-        types["participants"] = resp["individual_countries"]
-        del types["participating_countries"]
-    del ioc_data["participating_countries"]
-
-    return ioc_data
+    return resp["individual_countries"]

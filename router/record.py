@@ -8,7 +8,7 @@ from controllers.record_controller import (
     record_medal_default_restriction,
     record_medal_repechage_restriction,
     update_medal_to_ioc,
-    load_medal_from_ioc,
+    load_medal,
     find_status_of_that_sport_type
 )
 from db import sport_schedule_connection
@@ -24,7 +24,7 @@ router = APIRouter(
 
 @error_handler
 @router.get("/detail/{sport_id}")  # , response_model=RecordBody)
-def get_detail(sport_id: int) -> RecordBody | LoadMedalBody:
+def get_detail(sport_id: int): #-> RecordBody | LoadMedalBody:
     """Retrieve sport detail by sport ID and match it with schedule data."""
     resp = get_ioc_data(sport_id)
     current_schedule = list(
@@ -57,10 +57,10 @@ def get_detail(sport_id: int) -> RecordBody | LoadMedalBody:
     resp["sport_types"] = temp
 
     for types in resp["sport_types"]:
-        if types["status"] == SportStatus.RECORDED:
-            return LoadMedalBody(**load_medal_from_ioc(sport_id))
-        else:
-            return RecordBody(**resp)
+        if types["status"] == f"{SportStatus.RECORDED}":
+            # modify dict to match another body(dict of participants)
+            del types["participating_countries"]
+            types["participants"] = load_medal(sport_id, types["type_id"])
 
     return resp
 
@@ -116,4 +116,4 @@ def load(sport_id: int):
     Load medal allocation in sota database
     """
 
-    return load_medal_from_ioc(sport_id)
+    return load_medal(sport_id)
