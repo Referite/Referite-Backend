@@ -1,3 +1,5 @@
+import datetime
+
 from fastapi import APIRouter, Depends, HTTPException
 from auth.auth_handler import check_token
 
@@ -7,12 +9,15 @@ from controllers.record_controller import (
     record_medal_default_restriction,
     record_medal_repechage_restriction,
     update_medal_to_ioc,
-    load_medal_from_ioc,
+    load_medal,
+    find_status_of_that_sport_type
 )
 from db import sport_schedule_connection
-from models import IocMedalBody, LoadMedalBody, RecordBody, VerifyBody
+from models import IocMedalBody, LoadMedalBody, RecordBody, VerifyBody, LoadMedalSportTypeBody, ParticipantBody
 from utils import error_handler
 from iso3166 import countries_by_name
+from Enum.sportStatus import SportStatus
+from typing import Union
 
 router = APIRouter(
     prefix="/api/record", tags=["record"], responses={404: {"description": "Not found"}}, dependencies=[Depends(check_token)]
@@ -20,8 +25,8 @@ router = APIRouter(
 
 
 @error_handler
-@router.get("/detail/{sport_id}", response_model=RecordBody)
-def get_detail(sport_id: int):
+@router.get("/detail/{date}/{sport_id}")
+def get_detail(sport_id: int, date: datetime.datetime) -> Union[RecordBody, LoadMedalBody]:
     """Retrieve sport detail by sport ID and match it with schedule data."""
     resp = get_ioc_data(sport_id)
     current_schedule = list(
@@ -35,9 +40,20 @@ def get_detail(sport_id: int):
 
     remove_idx = []
 
+    formatted_competition_date = date.isoformat()
+
     for idx, types in enumerate(resp["sport_types"]):
         try:
-            types["competition_date"] = find_date_of_that_sport_type(
+            schedule_date = find_date_of_that_sport_type(
+                current_schedule, types["type_id"], sport_id   
+            )
+            if schedule_date != formatted_competition_date:
+                remove_idx.append(idx)
+                continue
+
+            types["competition_date"] =  schedule_date
+
+            types["status"] = find_status_of_that_sport_type(
                 current_schedule, types["type_id"], sport_id
             )
         except:
@@ -49,6 +65,12 @@ def get_detail(sport_id: int):
             temp.append(types)
 
     resp["sport_types"] = temp
+
+    for types in resp["sport_types"]:
+        if types["status"] == f"{SportStatus.RECORDED}" and types["competition_date"] == formatted_competition_date:
+
+            del types["participating_countries"]
+            types["participants"] = load_medal(sport_id, types["type_id"])
 
     return resp
 
@@ -103,4 +125,5 @@ def load(sport_id: int):
     """
     Load medal allocation in sota database
     """
-    return load_medal_from_ioc(sport_id)
+
+    return load_medal(sport_id)

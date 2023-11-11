@@ -1,5 +1,5 @@
 import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 from pydantic import BaseModel, field_validator, validator
 
@@ -51,15 +51,10 @@ class SportScheduleBody(BaseModel):
 class SportTypeRecordBody(BaseModel):
     type_id: int
     type_name: str
+    status: str
     competition_date: datetime.datetime
     participating_country_count: int
     participating_countries: List[str]
-
-
-class RecordBody(BaseModel):
-    sport_id: int
-    sport_name: str
-    sport_types: List[SportTypeRecordBody]
 
 
 class MedalBody(BaseModel):
@@ -87,6 +82,7 @@ class IocMedalBody(BaseModel):
 class LoadMedalSportTypeBody(BaseModel):
     type_id: int
     type_name: str
+    status: str
     participating_country_count: int
     competition_date: datetime.datetime
     participants: List[ParticipantBody]
@@ -97,7 +93,13 @@ class LoadMedalBody(BaseModel):
     sport_name: str
     sport_types: List[LoadMedalSportTypeBody]
 
+
+class RecordBody(BaseModel):
+    sport_id: int
+    sport_name: str
+    sport_types: List[SportTypeRecordBody]
+
+
 class TokenBody(BaseModel):
     access_token: str
     expired: str
-
