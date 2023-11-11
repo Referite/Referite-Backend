@@ -24,8 +24,8 @@ router = APIRouter(
 
 
 @error_handler
-@router.get("/detail/{sport_id}", response_model=RecordBody)
-def get_detail(sport_id: int):
+@router.get("/detail/{date}/{sport_id}")
+def get_detail(sport_id: int, date: datetime.datetime):
     """Retrieve sport detail by sport ID and match it with schedule data."""
     resp = get_ioc_data(sport_id)
     current_schedule = list(
@@ -39,11 +39,19 @@ def get_detail(sport_id: int):
 
     remove_idx = []
 
+    formatted_competition_date = date.strftime("%Y-%m-%dT%H:%M:%S")
+
     for idx, types in enumerate(resp["sport_types"]):
         try:
-            types["competition_date"] = find_date_of_that_sport_type(
+            schedule_date = find_date_of_that_sport_type(
                 current_schedule, types["type_id"], sport_id   
             )
+            if schedule_date != formatted_competition_date:
+                remove_idx.append(idx)
+                continue
+
+            types["competition_date"] =  schedule_date
+
             types["status"] = find_status_of_that_sport_type(
                 current_schedule, types["type_id"], sport_id
             )
@@ -58,8 +66,8 @@ def get_detail(sport_id: int):
     resp["sport_types"] = temp
 
     for types in resp["sport_types"]:
-        if types["status"] == f"{SportStatus.RECORDED}":
-            # modify dict to match another body(dict of participants)
+        if types["status"] == f"{SportStatus.RECORDED}" and types["competition_date"] == formatted_competition_date:
+
             del types["participating_countries"]
             types["participants"] = load_medal(sport_id, types["type_id"])
 

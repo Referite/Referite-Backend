@@ -203,7 +203,6 @@ def update_medal_to_ioc(medal: Dict):
 
 def load_medal(sport_id: int, type_id):
     """Load medal from IOC for showing in load detail page."""
-    print(type_id)
     resp = requests.get(
         f"https://sota-backend.fly.dev/medal/s/{sport_id}/t/{type_id}"
     ).json()
