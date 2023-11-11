@@ -56,14 +56,14 @@ def get_detail(sport_id: int, date: datetime.datetime) -> Union[RecordBody, Load
             types["status"] = find_status_of_that_sport_type(
                 current_schedule, types["type_id"], sport_id
             )
-        except:
+        except Exception:
             remove_idx.append(idx)
 
-    temp = []
-    for idx, types in enumerate(resp["sport_types"]):
-        if idx not in remove_idx:
-            temp.append(types)
-
+    temp = [
+        types
+        for idx, types in enumerate(resp["sport_types"])
+        if idx not in remove_idx
+    ]
     resp["sport_types"] = temp
 
     for types in resp["sport_types"]:
@@ -117,13 +117,3 @@ def update(ioc_medal_body: IocMedalBody):
     for medal_data in data["participants"]:
         medal_data["country"] = countries_by_name[medal_data["country"].upper()].alpha2
     return update_medal_to_ioc(data)
-
-
-@error_handler
-@router.get("/medal/load/{sport_id}", response_model=LoadMedalBody)
-def load(sport_id: int):
-    """
-    Load medal allocation in sota database
-    """
-
-    return load_medal(sport_id)
