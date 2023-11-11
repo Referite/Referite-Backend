@@ -46,7 +46,9 @@ def find_date_of_that_sport_type(schedule_data, type_id, sport_id):
             for sport_type in sport["sport_type"]:
                 if sport_type["type_id"] == type_id:
                     return schedule["datetime"]
-    raise HTTPException(400)
+    raise HTTPException(
+        400, f"No sport that matches you request type_id of sport {sport_id}"
+    )
 
 
 def find_status_of_that_sport_type(schedule_data, type_id, sport_id):
@@ -60,7 +62,9 @@ def find_status_of_that_sport_type(schedule_data, type_id, sport_id):
             for sport_type in sport["sport_type"]:
                 if sport_type["type_id"] == type_id:
                     return sport_type["status"]
-    raise HTTPException(400)
+    raise HTTPException(
+        400, f"No sport that matches you request type_id of sport {sport_id}"
+    )
 
 
 def record_medal_default_restriction(gold, silver, bronze):
