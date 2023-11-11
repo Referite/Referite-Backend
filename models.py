@@ -98,3 +98,8 @@ class RecordBody(BaseModel):
     sport_id: int
     sport_name: str
     sport_types: List[SportTypeRecordBody]
+
+
+class TokenBody(BaseModel):
+    access_token: str
+    expired: str

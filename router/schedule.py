@@ -1,4 +1,5 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from auth.auth_handler import check_token
 
 from db import sport_connection, sport_schedule_connection
 from models import SportScheduleBody
@@ -8,6 +9,7 @@ router = APIRouter(
     prefix="/api/schedule",
     tags=["schedule"],
     responses={404: {"description": "Not found"}},
+    dependencies=[Depends(check_token)],
 )
 
 

@@ -1,6 +1,7 @@
 import datetime
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from auth.auth_handler import check_token
 
 from controllers.record_controller import (
     find_date_of_that_sport_type,
@@ -18,13 +19,13 @@ from iso3166 import countries_by_name
 from Enum.sportStatus import SportStatus
 
 router = APIRouter(
-    prefix="/api/record", tags=["record"], responses={404: {"description": "Not found"}}
+    prefix="/api/record", tags=["record"], responses={404: {"description": "Not found"}}, dependencies=[Depends(check_token)]
 )
 
 
 @error_handler
-@router.get("/detail/{sport_id}")  # , response_model=RecordBody)
-def get_detail(sport_id: int): #-> RecordBody | LoadMedalBody:
+@router.get("/detail/{sport_id}", response_model=RecordBody)
+def get_detail(sport_id: int):
     """Retrieve sport detail by sport ID and match it with schedule data."""
     resp = get_ioc_data(sport_id)
     current_schedule = list(
