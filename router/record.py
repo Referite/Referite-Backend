@@ -17,6 +17,7 @@ from models import IocMedalBody, LoadMedalBody, RecordBody, VerifyBody, LoadMeda
 from utils import error_handler
 from iso3166 import countries_by_name
 from Enum.sportStatus import SportStatus
+from typing import Union
 
 router = APIRouter(
     prefix="/api/record", tags=["record"], responses={404: {"description": "Not found"}}, dependencies=[Depends(check_token)]
@@ -25,7 +26,7 @@ router = APIRouter(
 
 @error_handler
 @router.get("/detail/{date}/{sport_id}")
-def get_detail(sport_id: int, date: datetime.datetime):
+def get_detail(sport_id: int, date: datetime.datetime) -> Union[RecordBody, LoadMedalBody]:
     """Retrieve sport detail by sport ID and match it with schedule data."""
     resp = get_ioc_data(sport_id)
     current_schedule = list(
