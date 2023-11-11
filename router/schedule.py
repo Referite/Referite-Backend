@@ -9,11 +9,12 @@ router = APIRouter(
     prefix="/api/schedule",
     tags=["schedule"],
     responses={404: {"description": "Not found"}},
+    dependencies=[Depends(check_token)],
 )
 
 
 @error_handler
-@router.post("/add", status_code=201, dependencies=[Depends(check_token)])
+@router.post("/add", status_code=201)
 def add_sport_schedule(sport_schedule: SportScheduleBody):
     """endpoint to add sport schedule into db"""
     sport_schedule_connection.insert_one(sport_schedule.model_dump())
@@ -25,7 +26,7 @@ def add_sport_schedule(sport_schedule: SportScheduleBody):
 
 
 @error_handler
-@router.get("/all", dependencies=[Depends(check_token)])
+@router.get("/all")
 def get_schedule():
     """
     get all schedule
@@ -40,7 +41,7 @@ def get_schedule():
 
 
 @error_handler
-@router.get("/sport", dependencies=[Depends(check_token)])
+@router.get("/sport")
 def get_all_sport():
     """
     get all sport

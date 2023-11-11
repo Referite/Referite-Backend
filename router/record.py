@@ -15,12 +15,12 @@ from utils import error_handler
 from iso3166 import countries_by_name
 
 router = APIRouter(
-    prefix="/api/record", tags=["record"], responses={404: {"description": "Not found"}}
+    prefix="/api/record", tags=["record"], responses={404: {"description": "Not found"}}, dependencies=[Depends(check_token)]
 )
 
 
 @error_handler
-@router.get("/detail/{sport_id}", dependencies=[Depends(check_token)])  # , response_model=RecordBody)
+@router.get("/detail/{sport_id}", response_model=RecordBody)
 def get_detail(sport_id: int):
     """Retrieve sport detail by sport ID and match it with schedule data."""
     resp = get_ioc_data(sport_id)
@@ -54,7 +54,7 @@ def get_detail(sport_id: int):
 
 
 @error_handler
-@router.post("/verify", dependencies=[Depends(check_token)])
+@router.post("/verify")
 def verify_medal(verify_body: VerifyBody):
     """
     Record medal verification if it meets any restrictions and warn accordingly
@@ -86,7 +86,7 @@ def verify_medal(verify_body: VerifyBody):
 
 
 @error_handler
-@router.post("/medal/update", dependencies=[Depends(check_token)])
+@router.post("/medal/update")
 def update(ioc_medal_body: IocMedalBody):
     """
     Update medal allocation in sota database
@@ -98,7 +98,7 @@ def update(ioc_medal_body: IocMedalBody):
 
 
 @error_handler
-@router.get("/medal/load/{sport_id}", dependencies=[Depends(check_token)], response_model=LoadMedalBody)
+@router.get("/medal/load/{sport_id}", response_model=LoadMedalBody)
 def load(sport_id: int):
     """
     Load medal allocation in sota database
