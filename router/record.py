@@ -10,23 +10,35 @@ from controllers.record_controller import (
     record_medal_repechage_restriction,
     update_medal_to_ioc,
     load_medal,
-    find_status_of_that_sport_type
+    find_status_of_that_sport_type,
 )
 from db import sport_schedule_connection
-from models import IocMedalBody, LoadMedalBody, RecordBody, VerifyBody, LoadMedalSportTypeBody, ParticipantBody
+from models import (
+    IocMedalBody,
+    LoadMedalBody,
+    RecordBody,
+    VerifyBody,
+    LoadMedalSportTypeBody,
+    ParticipantBody,
+)
 from utils import error_handler
-from iso3166 import countries_by_name
 from Enum.sportStatus import SportStatus
 from typing import Union
+from utils import get_country_code
 
 router = APIRouter(
-    prefix="/api/record", tags=["record"], responses={404: {"description": "Not found"}}, dependencies=[Depends(check_token)]
+    prefix="/api/record",
+    tags=["record"],
+    responses={404: {"description": "Not found"}},
+    dependencies=[Depends(check_token)],
 )
 
 
 @error_handler
 @router.get("/detail/{date}/{sport_id}")
-def get_detail(sport_id: int, date: datetime.datetime) -> Union[RecordBody, LoadMedalBody]:
+def get_detail(
+    sport_id: int, date: datetime.datetime
+) -> Union[RecordBody, LoadMedalBody]:
     """Retrieve sport detail by sport ID and match it with schedule data."""
     resp = get_ioc_data(sport_id)
     current_schedule = list(
@@ -45,13 +57,14 @@ def get_detail(sport_id: int, date: datetime.datetime) -> Union[RecordBody, Load
     for idx, types in enumerate(resp["sport_types"]):
         try:
             schedule_date = find_date_of_that_sport_type(
-                current_schedule, types["type_id"], sport_id   
+                current_schedule, types["type_id"], sport_id
             )
+
             if schedule_date != formatted_competition_date:
                 remove_idx.append(idx)
                 continue
 
-            types["competition_date"] =  schedule_date
+            types["competition_date"] = schedule_date
 
             types["status"] = find_status_of_that_sport_type(
                 current_schedule, types["type_id"], sport_id
@@ -60,14 +73,12 @@ def get_detail(sport_id: int, date: datetime.datetime) -> Union[RecordBody, Load
             remove_idx.append(idx)
 
     temp = [
-        types
-        for idx, types in enumerate(resp["sport_types"])
-        if idx not in remove_idx
+        types for idx, types in enumerate(resp["sport_types"]) if idx not in remove_idx
     ]
     resp["sport_types"] = temp
 
     for types in resp["sport_types"]:
-        if types["status"] == f"{SportStatus.RECORDED}" and types["competition_date"] == formatted_competition_date:
+        if types["status"] == f"{SportStatus.RECORDED}":
 
             del types["participating_countries"]
             types["participants"] = load_medal(sport_id, types["type_id"])
@@ -115,5 +126,5 @@ def update(ioc_medal_body: IocMedalBody):
     """
     data = ioc_medal_body.model_dump()
     for medal_data in data["participants"]:
-        medal_data["country"] = countries_by_name[medal_data["country"].upper()].alpha2
+        medal_data["country"] = get_country_code(medal_data["country"])
     return update_medal_to_ioc(data)

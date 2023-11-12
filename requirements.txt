@@ -4,5 +4,4 @@ PyJWT
 bcrypt
 pymongo
 requests
-iso3166
-iso3166-2
+pycountry
