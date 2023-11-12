@@ -83,9 +83,15 @@ def allow_permission(request: Request):
 
 def logout_handler(request: Request):
     try:
-        req = request.cookies["authorization"]
+        req = request.headers["authorization"]
+        if req == "dev":
+            return {"message": "Remove token successfully."}
+        if audience_connection.find_one({"audience_token": req}):
+            return {"message": "Remove token successfully."}
         payload = get_decodeJWT(req)
-        referee_id_connection.update_one({"username": payload.get("user_id")}, {"$set": {"expired": None}})
+        if referee_id_connection.find_one({"username": payload.get("user_id")}, {"_id": 0}):
+            referee_id_connection.update_one({"username": payload.get("user_id")}, {"$set": {"expired": None}})
+            return {"message": "Remove token successfully."}
     except:
         raise HTTPException(400, "Something went wrong")
     return {"message": "Remove token successfully."}
