@@ -170,15 +170,21 @@ def record_medal_repechage_restriction(gold, silver, bronze):
 def update_status(sport_id: int, sport_type_id: int, status: SportStatus):
     """Update sport type status in sport schedule"""
     try:
-        sport_schedule_connection.update_one(
-            {"sport.sport_id": sport_id, "sport.sport_type.type_id": sport_type_id},
-            {"$set": {"sport.$[i].sport_type.$[j].status": status}},
-            array_filters=[{"i.sport_id": sport_id}, {"j.type_id": sport_id}],
-        )
+        # sport_schedule_connection.update_one(
+        #     {"sport.sport_id": sport_id, "sport.sport_type.type_id": sport_type_id},
+        #     {"$set": {"sport.$[i].sport_type.$[j].status": status}},
+        #     array_filters=[{"i.sport_id": sport_id}, {"j.type_id": sport_id}],
+        # )
+
+        query = {"sport.sport_id": sport_id, "sport.sport_type.type_id": sport_type_id}
+        update = {"$set": {"sport_type.type_id.status": status}}
+
+        res = sport_schedule_connection.update_one(query, update)
+
     except Exception as e:
         raise HTTPException(400, f"something went wrong: {e}")
     else:
-        return {"Message": "Status updated successfully."}
+        return {"Message": "Status updated successfully.", "Response": res}
 
 
 def update_medal_to_ioc(medal: Dict):
@@ -196,8 +202,11 @@ def update_medal_to_ioc(medal: Dict):
         return resp.json()
     data = resp.json()["Success"]
 
-    update_status(data["sport_id"], data["sport_type_id"], str(SportStatus.RECORDED))
-        
+    a = update_status(
+        data["sport_id"], data["sport_type_id"], str(SportStatus.RECORDED)
+    )
+    print(a)
+
     return resp.json()
 
 
