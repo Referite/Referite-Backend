@@ -176,10 +176,10 @@ def update_status(sport_id: int, sport_type_id: int, status: SportStatus):
         #     array_filters=[{"i.sport_id": sport_id}, {"j.type_id": sport_id}],
         # )
 
-        query = {"sport.sport_id": sport_id, "sport.sport_type.type_id": sport_type_id}
-        update = {"$set": {"sport_type.type_id.status": status}}
+        query = {"sport.sport_id": sport_id, "sport.sport_type.type_id": sport_type_id, "sport.sport_type.status": "TROPHY"}
+        update = {"$set": {"sport.$.sport_type.$[typeElem].status": status}}
 
-        res = sport_schedule_connection.update_one(query, update)
+        res = sport_schedule_connection.update_one(query, update, array_filters=[{"typeElem.type_id": sport_type_id, "typeElem.status": "TROPHY"}])
 
     except Exception as e:
         raise HTTPException(400, f"something went wrong: {e}")
@@ -206,7 +206,6 @@ def update_medal_to_ioc(medal: Dict):
         data["sport_id"], data["sport_type_id"], str(SportStatus.RECORDED)
     )
     print(a)
-
     return resp.json()
 
 
