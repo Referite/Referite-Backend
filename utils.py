@@ -2,6 +2,11 @@ from typing import Dict, List
 
 from Enum.sportStatus import SportStatus
 
+import pycountry
+
+mapping = {country.name: country.alpha_2 for country in pycountry.countries}
+mapping["Kosovo"] = "XK"
+
 
 def error_handler(f):
     def wrapper(*arg, **kwargs):
@@ -32,3 +37,13 @@ def calculate_sport_status(sport_types: List[Dict]):
         if sport_type["status"] == f"{SportStatus.TROPHY}":
             return SportStatus.TROPHY
     return SportStatus.RECORDED
+
+
+def get_country_name(country_code: str):
+    if country_code == "XK":
+        return "Kosovo"
+    return pycountry.countries.get(alpha_2=country_code).name
+
+
+def get_country_code(country_code: str):
+    return mapping.get(country_code)

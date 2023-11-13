@@ -7,7 +7,7 @@ from fastapi import HTTPException
 from db import sport_schedule_connection
 from Enum.sportStatus import SportStatus
 
-from iso3166 import countries
+from utils import get_country_name
 
 
 def get_ioc_data(sport_id: int):
@@ -16,7 +16,7 @@ def get_ioc_data(sport_id: int):
         resp = requests.get(f"https://sota-backend.fly.dev/sport/{sport_id}")
         ioc_data = resp.json()
     except Exception as e:
-        raise HTTPException(400, f"something went wrong with ioc_data: {e}")
+        raise HTTPException(400, f"something went wrong with ioc_data: {e}") from e
 
     del ioc_data["sport_summary"]
 
@@ -26,7 +26,7 @@ def get_ioc_data(sport_id: int):
         )
         sport_type["participating_countries"] = list(
             map(
-                lambda country: countries.get(country).name,
+                lambda country: get_country_name(country),
                 sport_type["participating_countries"],
             )
         )
@@ -170,15 +170,21 @@ def record_medal_repechage_restriction(gold, silver, bronze):
 def update_status(sport_id: int, sport_type_id: int, status: SportStatus):
     """Update sport type status in sport schedule"""
     try:
-        sport_schedule_connection.update_one(
-            {"sport.sport_id": sport_id, "sport.sport_type.type_id": sport_type_id},
-            {"$set": {"sport.$[i].sport_type.$[j].status": status}},
-            array_filters=[{"i.sport_id": sport_id}, {"j.type_id": sport_id}],
-        )
+        # sport_schedule_connection.update_one(
+        #     {"sport.sport_id": sport_id, "sport.sport_type.type_id": sport_type_id},
+        #     {"$set": {"sport.$[i].sport_type.$[j].status": status}},
+        #     array_filters=[{"i.sport_id": sport_id}, {"j.type_id": sport_id}],
+        # )
+
+        query = {"sport.sport_id": sport_id, "sport.sport_type.type_id": sport_type_id, "sport.sport_type.status": "TROPHY"}
+        update = {"$set": {"sport.$.sport_type.$[typeElem].status": status}}
+
+        res = sport_schedule_connection.update_one(query, update, array_filters=[{"typeElem.type_id": sport_type_id, "typeElem.status": "TROPHY"}])
+
     except Exception as e:
         raise HTTPException(400, f"something went wrong: {e}")
     else:
-        return {"Message": "Status updated successfully."}
+        return {"Message": "Status updated successfully.", "Response": res}
 
 
 def update_medal_to_ioc(medal: Dict):
@@ -196,8 +202,10 @@ def update_medal_to_ioc(medal: Dict):
         return resp.json()
     data = resp.json()["Success"]
 
-    update_status(data["sport_id"], data["sport_type_id"], str(SportStatus.RECORDED))
-
+    a = update_status(
+        data["sport_id"], data["sport_type_id"], str(SportStatus.RECORDED)
+    )
+    print(a)
     return resp.json()
 
 
