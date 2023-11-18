@@ -46,9 +46,13 @@ def add_some_data():
                     {
                         "type_id": 1,
                         "type_name": "11v11",
-                        "status": SportStatus.RECORDED,
+                        "status": SportStatus.RECORDED.value,  # Convert enum to string
                     },
-                    {"type_id": 2, "type_name": "7v7", "status": SportStatus.TROPHY},
+                    {
+                        "type_id": 2,
+                        "type_name": "7v7",
+                        "status": SportStatus.TROPHY.value,  # Convert enum to string
+                    },
                 ],
             }
         ],
