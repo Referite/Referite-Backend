@@ -1,12 +1,15 @@
 import pytest
+import httpx
 from fastapi.testclient import TestClient
 from main import app
 from db import sport_schedule_connection
 
+client = TestClient(app)
+
 @pytest.fixture(scope="module")
 def test_db():
     # Set up the test database
-    sport_schedule_connection.insert_one(
+    sport_schedule_connection.insert_many([
         {
             "datetime": "2021-08-01T00:00:00",
             "sport": [
@@ -20,12 +23,27 @@ def test_db():
                             "type_name": "11v11",
                             "status": "recorded",
                         },
-                        {"type_id": 2, "type_name": "7v7", "status": "trophy"},
+                        {
+                            "type_id": 2,
+                            "type_name": "7v7",
+                            "status": "trophy",
+                        },
                     ],
                 }
             ],
+        },
+        {
+            "datetime": "2021-09-01T00:00:00",
+            "sport": [
+                {
+                    "sport_id": 1,
+                    "sport_name": "Football",
+                    "is_ceremonies": True,
+                    "sport_type": None,
+                }
+            ],
         }
-    )
+    ])
 
     # Pass the DB connection to the test
     yield sport_schedule_connection
@@ -56,3 +74,9 @@ def test_add_some_data(test_app, test_db):
         response = client.get("/mock")
         assert response.status_code == 200
         assert response.json() == {"message": "data mocked"}
+
+
+def test_is_not_authenticated():
+    response = client.get("/api/schedule/all")
+    assert response.status_code == 401
+    assert response.json() == {"detail": "Please, Login"}
