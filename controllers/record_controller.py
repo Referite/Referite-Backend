@@ -170,16 +170,33 @@ def record_medal_repechage_restriction(gold, silver, bronze):
 def update_status(sport_id: int, sport_type_id: int, status: SportStatus):
     """Update sport type status in sport schedule"""
     try:
-        # sport_schedule_connection.update_one(
-        #     {"sport.sport_id": sport_id, "sport.sport_type.type_id": sport_type_id},
-        #     {"$set": {"sport.$[i].sport_type.$[j].status": status}},
-        #     array_filters=[{"i.sport_id": sport_id}, {"j.type_id": sport_id}],
-        # )
-
-        query = {"sport.sport_id": sport_id, "sport.sport_type.type_id": sport_type_id, "sport.sport_type.status": "TROPHY"}
+        query = {
+            "sport.sport_id": sport_id,
+            "sport.sport_type.type_id": sport_type_id,
+            "sport.sport_type.status": "TROPHY",
+        }
         update = {"$set": {"sport.$.sport_type.$[typeElem].status": status}}
 
-        res = sport_schedule_connection.update_one(query, update, array_filters=[{"typeElem.type_id": sport_type_id, "typeElem.status": "TROPHY"}])
+        all_schedule = sport_schedule_connection.find(query)
+        replace_date = find_date_of_that_sport_type(
+            all_schedule, sport_type_id, sport_id
+        )
+        query["datetime"] = replace_date
+        to_replace = sport_schedule_connection.find_one(query)
+
+        for sport in to_replace["sport"]:
+            if sport["sport_id"] == sport_id:
+                print(sport)
+                for types in sport["sport_type"]:
+                    if types["type_id"] == sport_type_id and types["status"] == str(
+                        SportStatus.TROPHY
+                    ):
+                        types["status"] = status
+                        # print(types)
+                        break
+
+        # # print(to_replace)
+        res = sport_schedule_connection.replace_one(query, to_replace)
 
     except Exception as e:
         raise HTTPException(400, f"something went wrong: {e}")
@@ -205,7 +222,6 @@ def update_medal_to_ioc(medal: Dict):
     a = update_status(
         data["sport_id"], data["sport_type_id"], str(SportStatus.RECORDED)
     )
-    print(a)
     return resp.json()
 
 
