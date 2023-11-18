@@ -175,7 +175,6 @@ def update_status(sport_id: int, sport_type_id: int, status: SportStatus):
             "sport.sport_type.type_id": sport_type_id,
             "sport.sport_type.status": "TROPHY",
         }
-        update = {"$set": {"sport.$.sport_type.$[typeElem].status": status}}
 
         all_schedule = sport_schedule_connection.find(query)
         replace_date = find_date_of_that_sport_type(
@@ -192,10 +191,8 @@ def update_status(sport_id: int, sport_type_id: int, status: SportStatus):
                         SportStatus.TROPHY
                     ):
                         types["status"] = status
-                        # print(types)
                         break
 
-        # # print(to_replace)
         res = sport_schedule_connection.replace_one(query, to_replace)
 
     except Exception as e:
