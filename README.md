@@ -21,7 +21,7 @@ cd Referite-Backend
 next, you have to create file name `.env` to configuration
 
 `.env` file template looks like [sample.env](sample.env) you can modify value and copy it into `.env`  
-**Note that you may get your .env by contacted siravich.te@ku.th or preawpan.ta@ku.th via email.**
+**Note that you may get your .env by contacted siravich.te@ku.th or preawpan.t@ku.th via email.**
 
 next, you have to create environment by typing this command
 
