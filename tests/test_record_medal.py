@@ -70,8 +70,7 @@ class TestRecordMedal(unittest.TestCase):
                                    "Warning": f"There are 2 gold medals awarded, Do you want to confirm this record?"})
         message = verify_medal(self.tie_silver_medal_verify)
         self.assertEqual(message, {"Message": "Medal allocation successful.",
-                                   "Warning": f"There are 2 silver medals awarded, "
-                                              f"Do you want to confirm this record?"})
+                                   "Warning": f"There are 2 silver medals awarded, Do you want to confirm this record?"})
 
     def test_exceeded_default_logic_medal_allocation(self):
         """Test if the returned warning message is correct if the total amount is exceeded."""
