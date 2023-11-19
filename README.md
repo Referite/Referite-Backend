@@ -32,11 +32,11 @@ python -m venv env
 then, activate the environment using
 
 ```js
-. env/bin/activate # macOS and Linux
 env\Scripts\activate.bat # Windows
+. env/bin/activate # macOS and Linux
 ```
 
-restart the terminal, the terminal will using environment now then typing this command to install requirements
+restart the terminal if using window, the terminal will using environment now then typing this command to install requirements
 
 ```js
 pip install -r requirements.txt
