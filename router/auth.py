@@ -39,7 +39,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
         access_token = create_access_token(form_data.username)
         referee_id_connection.update_one({"username": form_data.username}, {"$set": {"expired": date}})
         return {"access_token": access_token, "expired": date}
-    raise HTTPException(401, "Invalid credentials")
+    raise HTTPException(401, "Please, Login")
 
 @error_handler
 @router.get("/logout", dependencies=[Depends(logout_handler)])

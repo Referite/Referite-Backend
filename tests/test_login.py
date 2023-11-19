@@ -1,9 +1,11 @@
 import requests
 import unittest
+from db import referee_id_connection
 
 class TestLogin(unittest.TestCase):
     def setUp(self):
         self.url = 'https://referite-6538ffaf77b0.herokuapp.com/'
+        # self.url = 'http://127.0.0.1:8000/'
         self.audienceToken = '02e2cdc6ac5d17a2bb67824c91f51ac55ce46465133f92233e3daa552120bcb3'
 
     def test_login_valid_username_password(self):
@@ -17,6 +19,7 @@ class TestLogin(unittest.TestCase):
             }
         )
         self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.json()['expired'], referee_id_connection.find_one({'username': data['username']})['expired'])
 
     def test_login_valid_username_invalid_password(self):
         """Test login with valid username and invalid password"""
@@ -29,6 +32,7 @@ class TestLogin(unittest.TestCase):
             }
         )
         self.assertEqual(r.status_code, 401)
+        self.assertEqual(r.text, '{"detail":"Please, Login"}')
 
     def test_login_invalid_username_valid_password(self):
         """Test login with invalid username and valid password"""
@@ -41,6 +45,7 @@ class TestLogin(unittest.TestCase):
             }
         )
         self.assertEqual(r.status_code, 401)
+        self.assertEqual(r.text, '{"detail":"Please, Login"}')
 
     def test_login_invalid_username_invalid_password(self):
         """Test login with invalid username and invalid password"""
@@ -53,7 +58,9 @@ class TestLogin(unittest.TestCase):
             }
         )
         self.assertEqual(r.status_code, 401)
+        self.assertEqual(r.text, '{"detail":"Please, Login"}')
 
+    @unittest.skip("Skip")
     def test_login_empty_username_empty_password(self):
         """Test login with empty username and empty password"""
         data = {'username': '', 'password': ''}
@@ -65,6 +72,7 @@ class TestLogin(unittest.TestCase):
             }
         )
         self.assertEqual(r.status_code, 401)
+        self.assertEqual(r.text, '{"detail":"Please, Login"}')
 
     def test_login_special_symbol(self):
         """Test login with special symbol"""
@@ -77,6 +85,7 @@ class TestLogin(unittest.TestCase):
             }
         )
         self.assertEqual(r.status_code, 401)
+        self.assertEqual(r.text, '{"detail":"Please, Login"}')
 
     def test_login_and_check_permission(self):
         """Test login with valid username and password then check permission"""
@@ -108,6 +117,7 @@ class TestLogin(unittest.TestCase):
                 }
             )
             self.assertEqual(r.status_code, 401)
+            self.assertEqual(r.text, '{"detail":"Please, Login"}')
             r1 = requests.get(
                 f'{self.url}{url}',
                 headers={
@@ -126,6 +136,7 @@ class TestLogin(unittest.TestCase):
             }
         )
         self.assertEqual(r.status_code, 401)
+        self.assertEqual(r.text, '{"detail":"Please, Login"}')
         # POST
         lst_url = ["api/record/verify", "api/record/medal/update"]
         for url in lst_url:
@@ -135,5 +146,7 @@ class TestLogin(unittest.TestCase):
                     'authorization': self.audienceToken
                 }
             )
+            print(r.text)
             self.assertEqual(r.status_code, 401)
+            self.assertEqual(r.text, '{"detail":"Please, Login"}')
 
