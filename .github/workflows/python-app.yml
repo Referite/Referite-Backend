@@ -16,14 +16,6 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    env:
-      MONGO_URL: ${{secrets.MONGO_URL}}
-      JWT_SECRET: ${{secrets.JWT_SECRET}}
-      JWT_ALGORITHM: ${{secrets.JWT_ALGORITHM}}
-      IOC_ACCESS_TOKEN: ${{secrets.IOC_ACCESS_TOKEN}}
-      TEST_URL: ${{secrets.TEST_URL}}
-      AUDIENCE_TOKEN: ${{secrets.AUDIENCE_TOKEN}}
-      DEV_TOKEN: ${{secrets.DEV_TOKEN}}
 
     steps:
     - uses: actions/checkout@v3
@@ -42,6 +34,10 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        -name: create env file
+    - name: "create env file"
+      run: |
+        echo "${{ secrets.ENV_FILE }}" > .env
     - name: Test with unittest
       run: |
         echo $MONGO_URL || python -m unittest tests/test_*.py
