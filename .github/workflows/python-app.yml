@@ -16,6 +16,14 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      MONGO_URL: ${{secrets.MONGO_URL}}
+      JWT_SECRET: ${{secrets.JWT_SECRET}}
+      JWT_ALGORITHM: ${{secrets.JWT_ALGORITHM}}
+      IOC_ACCESS_TOKEN: ${{secrets.IOC_ACCESS_TOKEN}}
+      TEST_URL: ${{secrets.TEST_URL}}
+      AUDIENCE_TOKEN: ${{secrets.AUDIENCE_TOKEN}}
+      DEV_TOKEN: ${{secrets.DEV_TOKEN}}
 
     steps:
     - uses: actions/checkout@v3
