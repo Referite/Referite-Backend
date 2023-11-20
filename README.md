@@ -36,7 +36,7 @@ env\Scripts\activate.bat # Windows
 . env/bin/activate # macOS and Linux
 ```
 
-restart the terminal if using window, the terminal will using environment now then typing this command to install requirements
+the terminal will using environment now then typing this command to install requirements
 
 ```js
 pip install -r requirements.txt
@@ -51,5 +51,15 @@ make sure you do all the install part and environment is activate.
 uvicorn main:app
 ```
 go to `http://127.0.0.1:8000/` for application.  
+
+### How to create database
+1. Create ```dump``` folder in mongodb folder.
+2. Copy ```referee``` folder from ```dump_data``` in the repository to new ```dump``` folder that you create in mongodb folder.
+3. Run this command in terminal or docker terminal:
+```
+mongorestore  dump/
+```
+
+### Demo values for collections
 
 
