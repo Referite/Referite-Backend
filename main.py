@@ -54,6 +54,6 @@ def add_some_data():
         ],
     }
 
-    sport_schedule_connection.insert_many([body1, body2])
+    sport_schedule_connection.insert_many([body1])
 
     return {"message": "data mocked"}
