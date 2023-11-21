@@ -85,3 +85,11 @@ class TestLogin(unittest.TestCase):
             r = data_post_handler(url, self.AUDIENCE_TOKEN)
             self.assertEqual(r.status_code, 401)
             self.assertEqual(r.text, '{"detail":"Please, Login"}')
+
+    def test_logout(self):
+        """Test logout"""
+        r = login_post_handler('api/auth/token', {'username': 'referee', 'password': 'referee123'})
+        r1 = get_handler('api/auth/logout', r.json()['access_token'])
+        self.assertEqual(r1.status_code, 200)
+        self.assertEqual(r1.text, '{"message":"Logout Successfully"}')
+        self.assertEqual(None, referee_id_connection.find_one({'username': 'referee'})['expired'])
