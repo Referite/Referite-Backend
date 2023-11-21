@@ -36,7 +36,8 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: create env file
       run: |
-        echo "${{ secrets.ENV_FILE }}" > .env
+        echo "${{ secrets.MONGO_URL }}" > .env
+        echo "${{ secrets.JWT_SECRET }}" > .env
     - name: Test with unittest
       run: |
-        echo $MONGO_URL || python -m unittest tests/test_*.py
+        python -m unittest tests/test_*.py
