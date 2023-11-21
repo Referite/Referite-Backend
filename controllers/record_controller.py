@@ -216,9 +216,7 @@ def update_medal_to_ioc(medal: Dict):
         return resp.json()
     data = resp.json()["Success"]
 
-    a = update_status(
-        data["sport_id"], data["sport_type_id"], str(SportStatus.RECORDED)
-    )
+    update_status(data["sport_id"], data["sport_type_id"], str(SportStatus.RECORDED))
     return resp.json()
 
 
