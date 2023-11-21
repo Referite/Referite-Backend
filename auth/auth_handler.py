@@ -15,8 +15,12 @@ JWT_ALGORITHM = config("JWT_ALGORITHM", default="HS256")
 
 def create_access_token(user_id: str) -> Dict[str, str]:
     """Return a JWT token for the user_id that expires in 1 day"""
-    payload = {"user_id": user_id, "expires": (datetime.now() + timedelta(days=1)).isoformat()}
+    payload = {
+        "user_id": user_id,
+        "expires": (datetime.now() + timedelta(days=1)).isoformat(),
+    }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
 
 def get_decodeJWT(token: str) -> dict:
     """Return the decoded token if the token is valid, else return an empty dict"""
@@ -44,7 +48,6 @@ def check_password(id_body: RefereeIdBody):
     )
 
 
-
 def hash_password(id_body: RefereeIdBody):
     """Hash password"""
     return bcrypt.hashpw(id_body.password.encode("utf-8"), bcrypt.gensalt())
@@ -66,7 +69,8 @@ def check_token(request: Request):
         raise HTTPException(401, "Please, Login")
     if user is not None:
         return {"message": "Authorize"}
-    
+
+
 def allow_permission(request: Request):
     """Allow both audience and referee to access"""
     try:
@@ -76,23 +80,31 @@ def allow_permission(request: Request):
         if audience_connection.find_one({"audience_token": req}):
             return {"message": "Authorize Audience"}
         payload = get_decodeJWT(req)
-        if referee_id_connection.find_one({"username": payload.get("user_id")}, {"_id": 0}):
+        if referee_id_connection.find_one(
+            {"username": payload.get("user_id")}, {"_id": 0}
+        ):
             return {"message": "Authorize Referee"}
     except Exception:
         raise HTTPException(401, "Please, Login")
+
 
 def logout_handler(request: Request):
     try:
         req = request.headers["authorization"]
         if req == "dev":
             return {"message": "Remove token successfully."}
+
         if audience_connection.find_one({"audience_token": req}):
             return {"message": "Remove token successfully."}
+
         payload = get_decodeJWT(req)
-        if referee_id_connection.find_one({"username": payload.get("user_id")}, {"_id": 0}):
-            referee_id_connection.update_one({"username": payload.get("user_id")}, {"$set": {"expired": None}})
+        if referee_id_connection.find_one(
+            {"username": payload.get("user_id")}, {"_id": 0}
+        ):
+            referee_id_connection.update_one(
+                {"username": payload.get("user_id")}, {"$set": {"expired": None}}
+            )
             return {"message": "Remove token successfully."}
-    except:
-        raise HTTPException(400, "Something went wrong")
+    except Exception as e:
+        raise HTTPException(400, f"Something went wrong {e}")
     return {"message": "Remove token successfully."}
-    

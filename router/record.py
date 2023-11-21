@@ -18,8 +18,6 @@ from models import (
     LoadMedalBody,
     RecordBody,
     VerifyBody,
-    LoadMedalSportTypeBody,
-    ParticipantBody,
 )
 from utils import error_handler
 from Enum.sportStatus import SportStatus
