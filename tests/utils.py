@@ -16,7 +16,7 @@ def get_handler(path, token):
 def login_post_handler(path, data):
     """POST form data to url without authorization token"""
     return client.post(path,
-        json=urlencode(data),
+        data=urlencode(data),
         headers={
             'Content-Type': 'application/x-www-form-urlencoded'
         }
