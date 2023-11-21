@@ -54,18 +54,6 @@ def add_some_data():
         ],
     }
 
-    body2 = {
-        "datetime": "2021-09-01T00:00:00",
-        "sport": [
-            {
-                "sport_id": 1,
-                "sport_name": "Football",
-                "is_ceremonies": True,
-                "sport_type": None,
-            }
-        ],
-    }
-
-    sport_schedule_connection.insert_many([body1, body2])
+    sport_schedule_connection.insert_many([body1])
 
     return {"message": "data mocked"}

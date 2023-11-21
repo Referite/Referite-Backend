@@ -1,5 +1,5 @@
 import datetime
-from typing import Dict, List, Optional, Union
+from typing import List, Optional
 
 from pydantic import BaseModel, field_validator, validator
 
@@ -21,7 +21,7 @@ class SportTypeBody(BaseModel):
     def status_must_be_enum(cls, v: str):
         try:
             SportStatus(v)
-        except AssertionError as e:
+        except AssertionError:
             raise ValueError(
                 "status must be ['CEREMONIES', 'COMPETITIVE', 'TROPHY', 'RECORDED']"
             )
