@@ -77,6 +77,12 @@ def record_medal_default_restriction(gold, silver, bronze):
             400,
             f"""There are {total_medals} medals awarded, no need to record this body.""",
         )
+    elif gold >= 10 or silver >= 10 or bronze >= 10:
+        raise HTTPException(
+            400,
+            f"""There are 10 or more medals of a specific type awarded to a single country, 
+                This shouldn't be possible.""",
+        )
     elif gold >= 3 and silver + bronze > 0:
         raise HTTPException(
             400,
@@ -126,6 +132,12 @@ def record_medal_repechage_restriction(gold, silver, bronze):
         raise HTTPException(
             400,
             f"""There are {total_medals} medals awarded, no need to record this body.""",
+        )
+    elif gold >= 10 or silver >= 10 or bronze >= 10:
+        raise HTTPException(
+            400,
+            f"""There are 10 or more medals of a specific type awarded to a single country, 
+                This shouldn't be possible.""",
         )
     elif gold >= 4 and silver + bronze > 0:
         raise HTTPException(
