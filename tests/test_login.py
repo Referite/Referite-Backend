@@ -4,11 +4,10 @@ from db import referee_id_connection
 from .utils import get_handler, login_post_handler, data_post_handler
 from decouple import config
 
-AUDIENCE_TOKEN = config("AUDIENCE_TOKEN")
 
 class TestLogin(unittest.TestCase):
     def setUp(self):
-        self.audienceToken = AUDIENCE_TOKEN
+        self.AUDIENCE_TOKEN = config("AUDIENCE_TOKEN")
 
     def test_login_valid_username_password(self):
         """Test login with valid username and password"""
@@ -82,4 +81,3 @@ class TestLogin(unittest.TestCase):
             r = data_post_handler(url, self.audienceToken)
             self.assertEqual(r.status_code, 401)
             self.assertEqual(r.text, '{"detail":"Please, Login"}')
-
