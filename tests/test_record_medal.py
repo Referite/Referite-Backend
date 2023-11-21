@@ -1,5 +1,5 @@
 from unittest import TestCase
-from .utils import get_handler, login_post_handler, data_post_handler
+from .utils import data_post_handler
 from typing import Dict, List
 from decouple import config
 
