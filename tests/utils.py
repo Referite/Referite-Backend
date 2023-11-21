@@ -1,6 +1,7 @@
 from main import app
 from fastapi.testclient import TestClient
 from urllib.parse import urlencode
+from selenium.webdriver.common.by import By
 
 client = TestClient(app)
 
@@ -34,3 +35,12 @@ def data_post_handler(path, token, data=None):
             'authorization': token
         }
     )
+
+def browser_login(browser, username, password):
+    """Login to browser with username and password"""
+    browser.get("http://localhost:5173/")
+    browser.implicitly_wait(3)
+    browser.find_element(By.XPATH, '//*[@id="root"]/div/div/input[1]').send_keys(username) # username
+    browser.find_element(By.XPATH, '//*[@id="root"]/div/div/input[2]').send_keys(password) # password
+    browser.find_element(By.XPATH, '//*[@id="root"]/div/div/button').click() # Sign in button
+    browser.implicitly_wait(30)
