@@ -30,7 +30,6 @@ jobs:
         envkey_JWT_SECRET: ${{ secrets.JWT_SECRET }}
         envkey_JWT_ALGORITHM: ${{ secrets.JWT_ALGORITHM }}
         envkey_IOC_ACCESS_TOKEN: ${{ secrets.IOC_ACCESS_TOKEN }}
-        envkey_TEST_URL: ${{ secrets.TEST_URL }}
         envkey_AUDIENCE_TOKEN: ${{ secrets.AUDIENCE_TOKEN }}
       
     - name: Install dependencies
