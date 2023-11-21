@@ -36,7 +36,7 @@ def calculate_sport_status(sport_types: List[Dict]):
             return SportStatus.COMPETITIVE.value
         if sport_type["status"] == f"{SportStatus.TROPHY}":
             return SportStatus.TROPHY.value
-    return SportStatus.RECORDED
+    return SportStatus.RECORDED.value
 
 
 def get_country_name(country_code: str):
