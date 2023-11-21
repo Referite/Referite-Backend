@@ -31,11 +31,11 @@ def calculate_sport_status(sport_types: List[Dict]):
 
     for sport_type in sport_types:
         if sport_type["status"] == f"{SportStatus.CEREMONIES}":
-            return SportStatus.CEREMONIES
+            return SportStatus.CEREMONIES.value
         if sport_type["status"] == f"{SportStatus.COMPETITIVE}":
-            return SportStatus.COMPETITIVE
+            return SportStatus.COMPETITIVE.value
         if sport_type["status"] == f"{SportStatus.TROPHY}":
-            return SportStatus.TROPHY
+            return SportStatus.TROPHY.value
     return SportStatus.RECORDED
 
 
