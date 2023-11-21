@@ -31,6 +31,7 @@ jobs:
         envkey_JWT_ALGORITHM: ${{ secrets.JWT_ALGORITHM }}
         envkey_IOC_ACCESS_TOKEN: ${{ secrets.IOC_ACCESS_TOKEN }}
         envkey_AUDIENCE_TOKEN: ${{ secrets.AUDIENCE_TOKEN }}
+        envkey_DEV_TOKEN: ${{ secrets.DEV_TOKEN }}
       
     - name: Install dependencies
       run: |

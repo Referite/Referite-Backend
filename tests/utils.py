@@ -1,5 +1,6 @@
 from main import app
 from fastapi.testclient import TestClient
+from urllib.parse import urlencode
 
 client = TestClient(app)
 
@@ -15,7 +16,7 @@ def get_handler(path, token):
 def login_post_handler(path, data):
     """POST form data to url without authorization token"""
     return client.post(path,
-        json=data,
+        json=urlencode(data),
         headers={
             'Content-Type': 'application/x-www-form-urlencoded'
         }
