@@ -187,7 +187,6 @@ def update_status(sport_id: int, sport_type_id: int, status: SportStatus):
             "sport.sport_type.type_id": sport_type_id,
             "sport.sport_type.status": "TROPHY",
         }
-
         all_schedule = sport_schedule_connection.find(query)
         replace_date = find_date_of_that_sport_type(
             all_schedule, sport_type_id, sport_id

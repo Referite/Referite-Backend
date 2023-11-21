@@ -2,6 +2,7 @@ from selenium.webdriver import Chrome
 from selenium.webdriver.common.by import By
 import unittest
 from tests.utils import browser_login
+from db import sport_schedule_connection
 
 class HomepageE2ELocalTest(unittest.TestCase):
     def setUp(self) -> None:
@@ -40,3 +41,16 @@ class HomepageE2ELocalTest(unittest.TestCase):
         self.browser.implicitly_wait(30)
         self.browser.find_element(By.XPATH, '/html/body/div[2]/div/div[6]/button[1]').click() # click confirm button
         self.assertEqual(self.browser.current_url, "http://localhost:5173/record/4")
+        self.browser.back()
+        self.assertEqual(self.browser.current_url, "http://localhost:5173/")
+        self.browser.find_element(By.XPATH, '//*[@id="root"]/div/div[2]/table/tbody/tr[5]/td[14]/a/img').click() # click grey medals at XPATH
+        self.browser.find_element(By.XPATH, '//*[@id="root"]/div/div[2]/div[1]/div[1]/select').click()
+        self.browser.find_element(By.XPATH, '//*[@id="root"]/div/div[2]/div[1]/div[1]/select/option[2]').click()
+        self.browser.find_element(By.XPATH, '//*[@id="root"]/div/div[2]/div[2]/div/div[2]/div/div[2]').is_displayed() # check that Azerbaijan gold medal has 1 on it
+        self.browser.find_element(By.XPATH, '//*[@id="root"]/div/div[2]/div[2]/div/div[2]/div/div[7]').is_displayed() # check that latvia silver medal has 1 on it
+        self.browser.find_element(By.XPATH, '//*[@id="root"]/div/div[2]/div[2]/div/div[2]/div/div[12]').is_displayed() #check that nigeria bronze medal has 1 on it
+        # change status back to trophy
+        query = {"sport.sport_id": 4, "sport.sport_type.type_id": 39, "sport.sport_type.status": "RECORDED"}
+        update = {"$set": {"sport.$.sport_type.$[typeElem].status": "TROPHY"}}
+        sport_schedule_connection.update_one(query, update, array_filters=[{"typeElem.type_id": 39, "typeElem.status": "RECORDED"}])
+
