@@ -17,17 +17,13 @@ class TestHomepage(unittest.TestCase):
             for sport in schedule["sport"]:
                 sport["sport_status"] = calculate_sport_status(sport["sport_type"])
         return {"schedule_list": current_schedule}
-
     def test_get_all_sport_with_token(self):
         """Test get all sport with token"""
         data = {'username': 'referee', 'password': 'referee123'}
         r = login_post_handler('api/auth/token', data)
         r1 = get_handler('api/schedule/all', r.json()['access_token'])
-        # print(r1.json()["schedule_list"])
-        print(self.schedule()['schedule_list'])
-        # self.assertEqual(r1.json()["schedule_list"], self.schedule()['schedule_list'])
+        self.assertEqual(r1.json()["schedule_list"], self.schedule()['schedule_list'])
         self.assertEqual(r1.status_code, 200)
-
 
     def test_get_all_schedule_without_token(self):
         """Test get all schedule without token"""
