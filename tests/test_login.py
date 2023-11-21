@@ -3,12 +3,11 @@ from db import referee_id_connection
 from .utils import get_handler, login_post_handler, data_post_handler
 from decouple import config
 
-AUDIENCE_TOKEN = config("AUDIENCE_TOKEN")
 
 
 class TestLogin(unittest.TestCase):
     def setUp(self):
-        self.audienceToken = AUDIENCE_TOKEN
+        self.AUDIENCE_TOKEN = config("AUDIENCE_TOKEN")
 
     def test_login_valid_username_password(self):
         """Test login with valid username and password"""
@@ -60,6 +59,7 @@ class TestLogin(unittest.TestCase):
         """Test login with valid username and password then check permission"""
         data = {"username": "referee", "password": "referee123"}
         r = login_post_handler("api/auth/token", data)
+        print("r====", r.json())
         r1 = get_handler("api/schedule/all", r.json()["access_token"])
         self.assertEqual(r1.status_code, 200)
 
@@ -70,18 +70,18 @@ class TestLogin(unittest.TestCase):
             r = get_handler(url, "Toast")
             self.assertEqual(r.status_code, 401)
             self.assertEqual(r.text, '{"detail":"Please, Login"}')
-            r1 = get_handler(url, self.audienceToken)
+            r1 = get_handler(url, self.AUDIENCE_TOKEN)
             self.assertEqual(r1.status_code, 200)
 
     def test_audience_permission(self):
         """Test permission for other page that audience cannot access"""
         # GET
-        r = get_handler("api/record/detail/2024-08-01T00:00:00/1", self.audienceToken)
+        r = get_handler("api/record/detail/2024-08-01T00:00:00/1", self.AUDIENCE_TOKEN)
         self.assertEqual(r.status_code, 401)
         self.assertEqual(r.text, '{"detail":"Please, Login"}')
         # POST
         lst_url = ["api/record/verify", "api/record/medal/update"]
         for url in lst_url:
-            r = data_post_handler(url, self.audienceToken)
+            r = data_post_handler(url, self.AUDIENCE_TOKEN)
             self.assertEqual(r.status_code, 401)
             self.assertEqual(r.text, '{"detail":"Please, Login"}')
