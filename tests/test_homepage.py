@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch
-from db import sport_schedule_connection
+from db import sport_schedule_connection, sport_connection
 from tests.utils import get_handler, login_post_handler, data_post_handler
 from utils import calculate_sport_status
 from router.schedule import get_schedule
@@ -17,6 +17,11 @@ class TestHomepage(unittest.TestCase):
             for sport in schedule["sport"]:
                 sport["sport_status"] = calculate_sport_status(sport["sport_type"])
         return {"schedule_list": current_schedule}
+    
+    def sport(self):
+        all_sport = list(sport_connection.find({}, {"sport_type": 0, "_id": 0}))
+        return {"sport_list": all_sport}
+
     def test_get_all_sport_with_token(self):
         """Test get all sport with token"""
         data = {'username': 'referee', 'password': 'referee123'}
@@ -35,6 +40,7 @@ class TestHomepage(unittest.TestCase):
         data = {'username': 'referee', 'password': 'referee123'}
         r = login_post_handler('api/auth/token', data)
         r1 = get_handler('api/schedule/sport', r.json()['access_token'])
+        self.assertEqual(r1.json()["sport_list"], self.sport()['sport_list'])
         self.assertEqual(r1.status_code, 200)
 
     def test_add_schedule_without_token(self):
