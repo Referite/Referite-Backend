@@ -1,9 +1,7 @@
 import unittest
-from unittest.mock import patch
 from db import sport_schedule_connection, sport_connection
 from tests.utils import get_handler, login_post_handler, data_post_handler
 from utils import calculate_sport_status
-from router.schedule import get_schedule
 
 class TestHomepage(unittest.TestCase):
     def test_get_all_sport_without_token(self):
