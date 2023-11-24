@@ -5,3 +5,4 @@ bcrypt
 pymongo
 requests
 pycountry
+selenium
