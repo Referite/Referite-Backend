@@ -50,6 +50,15 @@ class TestRecordMedal(TestCase):
                                                                             create_participant("India", 0, 1, 1),
                                                                             create_participant("China", 0, 1, 0),
                                                                             create_participant("Japan", 0, 1, 0)])
+        self.impossible_10_gold_medal_verify = create_verify_body("Archery", [create_participant("Thailand", 10, 0, 0),
+                                                                             create_participant("China", 0, 0, 0),
+                                                                             create_participant("Japan", 0, 0, 0)])
+        self.impossible_10_silver_medal_verify = create_verify_body("Archery", [create_participant("Thailand", 0, 0, 0),
+                                                                             create_participant("China", 0, 10, 0),
+                                                                             create_participant("Japan", 0, 0, 0)])
+        self.impossible_10_bronze_medal_verify = create_verify_body("Archery", [create_participant("Thailand", 0, 0, 0),
+                                                                             create_participant("China", 0, 0, 0),
+                                                                             create_participant("Japan", 0, 0, 10)])
         self.mono_sport_verify = create_verify_body("Archery", [create_participant("Thailand", 1, 0, 0), ])
         self.zero_medal_verify = create_verify_body("Boxing", [create_participant("Thailand", 0, 0, 0),
                                                                create_participant("India", 0, 0, 0),
@@ -115,3 +124,18 @@ class TestRecordMedal(TestCase):
         request = data_post_handler(self.VERIFY_PATH, self.TOKEN, data=self.empty_verify)
         self.assertEqual(400, request.status_code)
         self.assertEqual('{"detail":"The participants can not be empty"}', request.text)
+
+    def test_400_bad_request_return_when_any_specific_medals_given_exceed_the_limit_of_10(self):
+        """Test if HTTP400 returned when inputting more than 10 medals of a specific type"""
+        request = data_post_handler(self.VERIFY_PATH, self.TOKEN, data=self.impossible_10_gold_medal_verify)
+        self.assertEqual(400, request.status_code)
+        self.assertEqual('{"detail":"There are 10 or more medals of a specific type awarded to a single country, '
+                         'This should not be possible."}', request.text)
+        request = data_post_handler(self.VERIFY_PATH, self.TOKEN, data=self.impossible_10_silver_medal_verify)
+        self.assertEqual(400, request.status_code)
+        self.assertEqual('{"detail":"There are 10 or more medals of a specific type awarded to a single country, '
+                         'This should not be possible."}', request.text)
+        request = data_post_handler(self.VERIFY_PATH, self.TOKEN, data=self.impossible_10_bronze_medal_verify)
+        self.assertEqual(400, request.status_code)
+        self.assertEqual('{"detail":"There are 10 or more medals of a specific type awarded to a single country, '
+                         'This should not be possible."}', request.text)
