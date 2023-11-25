@@ -24,6 +24,8 @@ router = APIRouter(
     prefix="/api/auth", tags=["auth"], responses={404: {"description": "Not found"}}
 )
 
+expire_time = timedelta(days=1)
+
 @error_handler
 @router.post("/token", status_code=201, response_model=TokenBody)
 def login(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -31,7 +33,6 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
     Receive username and password from body and check if user exists in database and password is correct
     then set cookie with the access token that expires in 1 day, after that redirect to homepage
     """
-    expire_time = timedelta(days=1)
     date = (datetime.now() + expire_time).isoformat()
     if check_user(form_data) and check_password(form_data):
         access_token = create_access_token(form_data.username)
