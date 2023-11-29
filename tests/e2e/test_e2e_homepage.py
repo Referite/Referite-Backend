@@ -1,7 +1,7 @@
 from selenium.webdriver import Chrome
 from selenium.webdriver.common.by import By
 import unittest
-from tests.utils import browser_login
+from tests.utils import browser_login, change_status_to_trophy
 from db import sport_schedule_connection
 
 
@@ -18,12 +18,12 @@ class HomepageE2ELocalTest(unittest.TestCase):
         self.browser.implicitly_wait(30)
         self.assertEqual(
             self.browser.current_url,
-            "http://localhost:5173/record/4/2024-08-06T00:00:00",
+            "http://localhost:5173/record/1/2024-07-28T00:00:00",
         )
 
     def test_redirect_to_record_page_without_login(self):
         """Test redirect to record page without_login"""
-        self.browser.get("http://localhost:5173/record/1")
+        self.browser.get("http://localhost:5173/record/1/2024-07-28T00:00:00")
         self.browser.implicitly_wait(30)
         self.assertEqual(self.browser.current_url, "http://localhost:5173/login")
 
@@ -82,7 +82,7 @@ class HomepageE2ELocalTest(unittest.TestCase):
         self.browser.find_element(
             By.XPATH, "/html/body/div[2]/div/div[6]/button[1]"
         ).click()  # click confirm button
-        self.assertEqual(self.browser.current_url, "http://localhost:5173/record/4")
+        self.assertEqual(self.browser.current_url, "http://localhost:5173/record/4/2024-08-06T00:00:00")
         self.browser.back()
         self.assertEqual(self.browser.current_url, "http://localhost:5173/")
         self.browser.find_element(
@@ -103,15 +103,4 @@ class HomepageE2ELocalTest(unittest.TestCase):
         self.browser.find_element(
             By.XPATH, '//*[@id="root"]/div/div[2]/div[2]/div/div[2]/div/div[12]'
         ).is_displayed()  # check that nigeria bronze medal has 1 on it
-        # change status back to trophy
-        query = {
-            "sport.sport_id": 4,
-            "sport.sport_type.type_id": 39,
-            "sport.sport_type.status": "RECORDED",
-        }
-        update = {"$set": {"sport.$.sport_type.$[typeElem].status": "TROPHY"}}
-        sport_schedule_connection.update_one(
-            query,
-            update,
-            array_filters=[{"typeElem.type_id": 39, "typeElem.status": "RECORDED"}],
-        )
+        change_status_to_trophy()

@@ -64,7 +64,7 @@ class RecordPageE2ELocalTest(unittest.TestCase):
         self.browser.find_element(
             By.XPATH, "/html/body/div[2]/div/div[6]/button[1]"
         ).click()  # click confirm button
-        self.assertEqual(self.browser.current_url, "http://localhost:5173/record/4")
+        self.assertEqual(self.browser.current_url, "http://localhost:5173/record/4/2024-08-06T00:00:00")
         # change status back to trophy
         change_status_to_trophy()
 
