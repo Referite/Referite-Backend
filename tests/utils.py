@@ -51,3 +51,4 @@ def change_status_to_trophy():
     query = {"sport.sport_id": 4, "sport.sport_type.type_id": 39, "sport.sport_type.status": "RECORDED"}
     update = {"$set": {"sport.$.sport_type.$[typeElem].status": "TROPHY"}}
     sport_schedule_connection.update_one(query, update, array_filters=[{"typeElem.type_id": 39, "typeElem.status": "RECORDED"}])
+    print("updated")
