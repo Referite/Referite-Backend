@@ -2,7 +2,7 @@ from unittest import TestCase
 from .utils import data_post_handler, get_handler
 from typing import Dict, List
 from decouple import config
-from controllers.record_controller import load_medal
+from controllers.record_controller import load_medal, update_status
 
 def create_participant(country_name: str, gold: int, sliver: int, bronze: int) -> Dict:
     return {"country": country_name, "medal": {"gold": gold, "silver": sliver, "bronze": bronze}}
@@ -167,73 +167,60 @@ class TestRecordMedal(TestCase):
         self.assertEqual(200, resp.status_code)
         self.assertIn("Netherlands", get_country_from_sport_id_and_sport_type_id(1, 1))
 
+    def tearDown(self):
+        update_status(1, 1, "TROPHY")
+
+
 class TestGetSportDetail(TestCase):
 
     def setUp(self):
         self.GET_SPORT_DETAIL_PATH = 'api/record/detail/'
         self.TOKEN = config("DEV_TOKEN")
         self.response_detail = {
-                "sport_id": 1,
-                "sport_name": "Archery",
-                "sport_types": [
-                    {
-                        "type_id": 1,
-                        "type_name": "Individual Men's",
-                        "status": "TROPHY",
-                        "competition_date": "2024-08-04T00:00:00",
-                        "participating_country_count": 40,
-                        "participating_countries": [
-                            "Tunisia",
-                            "Bangladesh",
-                            "Indonesia",
-                            "Belgium",
-                            "India",
-                            "Italy",
-                            "Kazakhstan",
-                            "Korea, Republic of",
-                            "Ukraine",
-                            "Egypt",
-                            "Mexico",
-                            "Germany",
-                            "United States",
-                            "Chile",
-                            "Virgin Islands, U.S.",
-                            "France",
-                            "Israel",
-                            "Moldova, Republic of",
-                            "Colombia",
-                            "Netherlands",
-                            "Malaysia",
-                            "Taiwan, Province of China",
-                            "Finland",
-                            "Canada",
-                            "United Kingdom",
-                            "Spain",
-                            "Japan",
-                            "Luxembourg",
-                            "Mongolia",
-                            "Viet Nam",
-                            "China",
-                            "Russian Federation",
-                            "Slovenia",
-                            "Malawi",
-                            "Iran, Islamic Republic of",
-                            "Hungary",
-                            "Turkey",
-                            "Poland",
-                            "Australia",
-                            "Brazil"
-                        ]
-                    }
-                ]
-            }
-
-        # self.response_detail_updated = {}
+                    "sport_id": 1,
+                    "sport_name": "Archery",
+                    "sport_types": [
+                        {
+                            "type_id": 1,
+                            "type_name": "Individual Men's",
+                            "status": "RECORDED",
+                            "participating_country_count": 40,
+                            "competition_date": "2024-08-04T00:00:00",
+                            "participants": [
+                                {
+                                    "country": "Netherlands",
+                                    "medal": {
+                                        "gold": 1,
+                                        "silver": 0,
+                                        "bronze": 0
+                                    }
+                                },
+                                {
+                                    "country": "Australia",
+                                    "medal": {
+                                        "gold": 0,
+                                        "silver": 1,
+                                        "bronze": 0
+                                    }
+                                },
+                                {
+                                    "country": "Colombia",
+                                    "medal": {
+                                        "gold": 0,
+                                        "silver": 0,
+                                        "bronze": 1
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+        update_status(1, 1, "TROPHY")
 
     def test_get_sport_detail(self):
         """Test if the sport detail is returned correctly."""
         # recording
-        url = f'{self.GET_SPORT_DETAIL_PATH}2024-08-04T00:00:00/1'
+        url = self.GET_SPORT_DETAIL_PATH + '2024-08-04T00:00:00/1'
         response = get_handler(url, self.TOKEN)
         self.assertEqual(200, response.status_code)
         self.assertEqual(self.response_detail, response.json())
@@ -272,11 +259,14 @@ class TestGetSportDetail(TestCase):
         # after recording
         response = get_handler(url, self.TOKEN)
         self.assertEqual(200, response.status_code)
-        # self.assertEqual(self.response_detail_updated, response.json())
+        self.assertEqual(self.response_detail, response.json())
 
     def test_get_sport_detail_with_invalid_date(self):
         """Test if the sport detail is returned correctly when the inputted date is invalid."""
-        url = f'{self.GET_SPORT_DETAIL_PATH}2023-08-01T00:00:00/1'
+        url = self.GET_SPORT_DETAIL_PATH + '2022-08-03T00:00:00/1'
         response = get_handler(url, self.TOKEN)
         self.assertEqual(200, response.status_code)
-        self.assertEqual({"sport_id": 1, "sport_name": "Archery", "sport_types": []}, response.json())
+
+    def tearDown(self):
+        update_status(1, 1, "TROPHY")
+
