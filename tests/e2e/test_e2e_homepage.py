@@ -29,6 +29,7 @@ class HomepageE2ELocalTest(unittest.TestCase):
 
     def test_redirect_of_record_medal_workflow(self):
         """Test redirect of record medal workflow and record medal"""
+        change_status_to_trophy()
         self.browser.find_element(
             By.XPATH, '//*[@id="root"]/div/div[2]/table/tbody/tr[5]/td[14]/a/img'
         ).click()  # click medals at XPATH
@@ -104,3 +105,9 @@ class HomepageE2ELocalTest(unittest.TestCase):
             By.XPATH, '//*[@id="root"]/div/div[2]/div[2]/div/div[2]/div/div[12]'
         ).is_displayed()  # check that nigeria bronze medal has 1 on it
         change_status_to_trophy()
+
+    def test_find_handbook(self):
+        self.browser.find_element(By.XPATH, '//*[@id="root"]/div/div[1]/div[2]/a/img').is_displayed()
+        self.browser.find_element(By.XPATH, '//*[@id="root"]/div/div[1]/div[2]/a/img').click()
+        self.browser.implicitly_wait(5)
+        self.assertEqual(self.browser.current_url, 'https://drive.google.com/file/d/1d-70xUqSSYS045Lbe6G2hZzCoUym_Fiv/view')
