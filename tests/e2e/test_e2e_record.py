@@ -11,6 +11,7 @@ class RecordPageE2ELocalTest(unittest.TestCase):
 
     def test_default_record_medal_workflow(self):
         """Test record medal workflow of default standard olympics"""
+        change_status_to_trophy()
         self.browser.find_element(
             By.XPATH, '//*[@id="root"]/div/div[2]/table/tbody/tr[5]/td[14]/a/img'
         ).click()  # click medals at XPATH
@@ -70,6 +71,7 @@ class RecordPageE2ELocalTest(unittest.TestCase):
 
     def test_invalid_medal_record_workflow_negative(self):
         """Test invalid medal record workflow"""
+        change_status_to_trophy()
         # empty case
         self.browser.find_element(
             By.XPATH, '//*[@id="root"]/div/div[2]/table/tbody/tr[5]/td[14]/a/img'
@@ -153,6 +155,7 @@ class RecordPageE2ELocalTest(unittest.TestCase):
 
     def test_special_case_medal_record_workflow(self):
         """Test special case medal record workflow"""
+        change_status_to_trophy()
         self.browser.find_element(
             By.XPATH, '//*[@id="root"]/div/div[2]/table/tbody/tr[5]/td[14]/a/img'
         ).click()  # click medals at XPATH
@@ -213,6 +216,7 @@ class RecordPageE2ELocalTest(unittest.TestCase):
 
     def test_impossible_medal_quantity_record_workflow(self):
         """Test impossible medal quantity record workflow"""
+        change_status_to_trophy()
         self.browser.find_element(
             By.XPATH, '//*[@id="root"]/div/div[2]/table/tbody/tr[5]/td[14]/a/img'
         ).click()  # click medals at XPATH
@@ -268,6 +272,7 @@ class RecordPageE2ELocalTest(unittest.TestCase):
 
     def test_invalid_countries_selection_of_record_workflow(self):
         """Test invalid countries selection"""
+        change_status_to_trophy()
         # record without selecting any country
         self.browser.find_element(
             By.XPATH, '//*[@id="root"]/div/div[2]/table/tbody/tr[5]/td[14]/a/img'
