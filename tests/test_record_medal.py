@@ -2,7 +2,7 @@ from unittest import TestCase
 from .utils import data_post_handler
 from typing import Dict, List
 from decouple import config
-
+from controllers.record_controller import load_medal
 
 def create_participant(country_name: str, gold: int, sliver: int, bronze: int) -> Dict:
     return {"country": country_name, "medal": {"gold": gold, "silver": sliver, "bronze": bronze}}
@@ -11,10 +11,17 @@ def create_participant(country_name: str, gold: int, sliver: int, bronze: int) -
 def create_verify_body(sport_name: str, participants: List) -> Dict:
     return {"sport_name": sport_name, "participants": participants}
 
+def create_update_body(sport_id: int, sport_type_id: int, participant: list) -> Dict:
+    return {"sport_id": sport_id, "sport_type_id": sport_type_id, "participants": participant}
+
+def get_country_from_sport_id_and_sport_type_id(sport_id: int, sport_type_id: int) -> List:
+    resp = load_medal(sport_id, sport_type_id)
+    return [data['country'] for data in resp]
 
 class TestRecordMedal(TestCase):
     def setUp(self):
         self.VERIFY_PATH = 'api/record/verify'
+        self.UPDATE_PATH = 'api/record/medal/update'
         self.TOKEN = config("DEV_TOKEN")
         self.default_verify = create_verify_body("Archery", [create_participant("Thailand", 1, 0, 0),
                                                              create_participant("China", 0, 1, 0),
@@ -65,6 +72,14 @@ class TestRecordMedal(TestCase):
                                                                create_participant("China", 0, 0, 0),
                                                                create_participant("Japan", 0, 0, 0)])
         self.empty_verify = create_verify_body("Archery", [])
+
+        self.fail_update_body = create_update_body(1, 1, [create_participant("Thailand", 1, 0, 0),
+                                                     create_participant("China", 0, 1, 0),
+                                                     create_participant("Japan", 0, 0, 1)])
+        
+        self.success_update_body = create_update_body(1, 1, [create_participant("Netherlands", 1, 0, 0),
+                                                     create_participant("Australia", 0, 1, 0),
+                                                     create_participant("Colombia", 0, 0, 1)])
 
     def test_success_medal_allocation(self):
         """Test if the success medal allocation return message correctly."""
@@ -139,3 +154,16 @@ class TestRecordMedal(TestCase):
         self.assertEqual(400, request.status_code)
         self.assertEqual('{"detail":"There are 10 or more medals of a specific type awarded to a single country, '
                          'This should not be possible."}', request.text)
+        
+    def test_update_medal_that_country_not_paritcipating_ca(self):
+        resp = data_post_handler(self.UPDATE_PATH, self.TOKEN, data=self.fail_update_body)
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(resp.json()['detail'][0]['msg'], 'Value error, Country TH is not participating in the given sport_id 1 and type_id 1')
+        self.assertNotIn("Thailand", get_country_from_sport_id_and_sport_type_id(1, 1))
+        # self.assertIn("Thailand", get_country_from_sport_id_and_sport_type_id(1, 1))
+
+
+    def test_update_medal_that_country_that_participated(self):
+        resp = data_post_handler(self.UPDATE_PATH, self.TOKEN, data=self.success_update_body)
+        self.assertEqual(200, resp.status_code)
+        self.assertIn("Netherlands", get_country_from_sport_id_and_sport_type_id(1, 1))

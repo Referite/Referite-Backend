@@ -329,3 +329,5 @@ class RecordPageE2ELocalTest(unittest.TestCase):
         self.browser.find_element(
             By.XPATH, "/html/body/div[2]/div/div[6]/button[1]"
         ).click()  # click try again button
+
+
