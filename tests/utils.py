@@ -37,6 +37,7 @@ def data_post_handler(path, token, data=None):
         }
     )
 
+
 def browser_login(browser, username, password):
     """Login to browser with username and password"""
     browser.get("http://localhost:5173/")
@@ -52,3 +53,6 @@ def change_status_to_trophy():
     update = {"$set": {"sport.$.sport_type.$[typeElem].status": "TROPHY"}}
     sport_schedule_connection.update_one(query, update, array_filters=[{"typeElem.type_id": 39, "typeElem.status": "RECORDED"}])
     print("updated")
+
+
+    

@@ -1,5 +1,5 @@
 from unittest import TestCase
-from .utils import data_post_handler
+from .utils import data_post_handler, get_handler
 from typing import Dict, List
 from decouple import config
 
@@ -139,3 +139,79 @@ class TestRecordMedal(TestCase):
         self.assertEqual(400, request.status_code)
         self.assertEqual('{"detail":"There are 10 or more medals of a specific type awarded to a single country, '
                          'This should not be possible."}', request.text)
+
+
+class TestGetSportDetail(TestCase):
+
+    def setUp(self):
+        self.GET_SPORT_DETAIL_PATH = 'api/record/detail/'
+        self.TOKEN = config("DEV_TOKEN")
+        self.response_detail = {
+                "sport_id": 1,
+                "sport_name": "Archery",
+                "sport_types": [
+                    {
+                        "type_id": 1,
+                        "type_name": "Individual Men's",
+                        "status": "TROPHY",
+                        "competition_date": "2024-08-04T00:00:00",
+                        "participating_country_count": 40,
+                        "participating_countries": [
+                            "Tunisia",
+                            "Bangladesh",
+                            "Indonesia",
+                            "Belgium",
+                            "India",
+                            "Italy",
+                            "Kazakhstan",
+                            "Korea, Republic of",
+                            "Ukraine",
+                            "Egypt",
+                            "Mexico",
+                            "Germany",
+                            "United States",
+                            "Chile",
+                            "Virgin Islands, U.S.",
+                            "France",
+                            "Israel",
+                            "Moldova, Republic of",
+                            "Colombia",
+                            "Netherlands",
+                            "Malaysia",
+                            "Taiwan, Province of China",
+                            "Finland",
+                            "Canada",
+                            "United Kingdom",
+                            "Spain",
+                            "Japan",
+                            "Luxembourg",
+                            "Mongolia",
+                            "Viet Nam",
+                            "China",
+                            "Russian Federation",
+                            "Slovenia",
+                            "Malawi",
+                            "Iran, Islamic Republic of",
+                            "Hungary",
+                            "Turkey",
+                            "Poland",
+                            "Australia",
+                            "Brazil"
+                        ]
+                    }
+                ]
+            }
+
+    def test_get_sport_detail(self):
+        """Test if the sport detail is returned correctly."""
+        url = self.GET_SPORT_DETAIL_PATH + '2024-08-04T00:00:00/1'
+        response = get_handler(url, self.TOKEN)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(self.response_detail, response.json())
+
+    def test_get_sport_detail_with_invalid_date(self):
+        """Test if the sport detail is returned correctly when the inputted date is invalid."""
+        url = self.GET_SPORT_DETAIL_PATH + '2023-08-01T00:00:00/1'
+        response = get_handler(url, self.TOKEN)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual({"sport_id": 1, "sport_name": "Archery", "sport_types": []}, response.json())
